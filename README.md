@@ -3,9 +3,8 @@
 ## Group Members
 <small>Akif Asyrani Bin Mohamad Izani - 2210267</small><br/>
 <small>Rusyaida Nasuha Binti Rasnijeery - 2019922</small><br/>
-<small>Ahmad Khairil Amin Bin Hishamuddin - 2212947</small>
+<small>AHMAD KHAIRIL AMIN BIN HISHAMUDDIN - 2212947</small>
 
 ## Overview
-Test
 
 ## Objective
