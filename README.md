@@ -1,3 +1,3 @@
-# Group-Project-ABC-MAD-
+# ABC Group Project (MAD)
 
-# Group Members
+## Group Members
