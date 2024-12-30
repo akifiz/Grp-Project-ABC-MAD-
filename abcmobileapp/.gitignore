@@ -57,6 +57,7 @@ web/
 macos/
 windows/
 linux/
+test/
 
 # IDE specific
 .idea/
