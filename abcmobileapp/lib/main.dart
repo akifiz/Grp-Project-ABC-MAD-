@@ -15,6 +15,7 @@ class MainApp extends StatelessWidget {
         body: Center(
           child: Text('MAD GROUP PROJECT MOBILE APPLICATION'),
           child: Text(' TEJSITJTIOSEJTIOSJ')
+
         ),
       ),
     );
