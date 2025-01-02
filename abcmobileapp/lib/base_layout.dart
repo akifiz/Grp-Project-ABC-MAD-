@@ -15,9 +15,11 @@ class BaseLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: AppColors.background,
-        child: child,
+      body: SafeArea( // Apply SafeArea globally
+        child: Container(
+          color: AppColors.background,
+          child: child,
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: AppColors.subAlt,

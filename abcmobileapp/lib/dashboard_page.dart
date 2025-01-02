@@ -19,7 +19,7 @@ class DashboardPage extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
         ),
-        const SizedBox(height: 40), // Adjust gap between header and content
+        const SizedBox(height: 30), // Adjust gap between header and content
         Expanded(
           child: Center(
             child: Text(
