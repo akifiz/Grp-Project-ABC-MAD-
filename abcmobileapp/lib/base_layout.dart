@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
 class BaseLayout extends StatelessWidget {
-  final Widget child; // Unique content of each page
-  final int currentIndex; // Active tab index
-  final Function(int) onTabTapped; // Tab switch callback
+  final Widget child;
+  final int currentIndex;
+  final Function(int) onTabTapped;
 
   const BaseLayout({
     required this.child,
@@ -15,23 +15,15 @@ class BaseLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'APP NAME',
-          style: TextStyle(color: AppColors.text),
-        ),
-        centerTitle: true,
-        backgroundColor: AppColors.sub, // AppBar color
-      ),
       body: Container(
-        color: AppColors.background, // Page background color
+        color: AppColors.background,
         child: child,
       ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: AppColors.subAlt, // Bottom nav background
+        backgroundColor: AppColors.subAlt,
         currentIndex: currentIndex,
-        selectedItemColor: AppColors.main, // Active tab color
-        unselectedItemColor: AppColors.text, // Inactive tab color
+        selectedItemColor: AppColors.text,
+        unselectedItemColor: AppColors.main,
         onTap: onTabTapped,
         items: const [
           BottomNavigationBarItem(
