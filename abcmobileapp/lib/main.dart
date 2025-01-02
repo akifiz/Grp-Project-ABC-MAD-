@@ -6,6 +6,7 @@ import 'app_colors.dart';
 void main() {
   runApp(MyApp());
 }
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
           displayLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.text), // Header font
           bodyLarge: TextStyle(fontSize: 18, color: AppColors.text), // Large size font
           bodyMedium: TextStyle(fontSize: 16, color: AppColors.text), // Medium size font
-      ),
+        ),
       ),
       home: MainApp(),
     );
@@ -30,46 +31,71 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
-  int _currentIndex = 1; // Default to "Dashboard"
+  int _currentIndex = 1; // Default to "Dashboard" tab
+  final PageController _pageController = PageController(initialPage: 1); // Controller for full-screen swipe navigation
+
+  @override
+  void dispose() {
+    _pageController.dispose(); // Clean up PageController when not in use
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return BaseLayout(
-      currentIndex: _currentIndex,
-      onTabTapped: (index) {
-        setState(() {
-          _currentIndex = index; // Update the selected index
-        });
-      },
-      child: _getPage(_currentIndex), // Pass the unique content for the current tab
+    return Scaffold(
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
+          setState(() {
+            _currentIndex = index; // Sync current index with swipe
+          });
+        },
+        // BOTTOM NAVIGATION BAR
+        children: [
+          // Settings Page
+          BaseLayout(
+            currentIndex: _currentIndex,
+            onTabTapped: _onTabTapped,
+            child: Center(
+              child: Text(
+                "Settings Page",
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ),
+          ),
+
+          // Dashboard Page
+          BaseLayout(
+            currentIndex: _currentIndex,
+            onTabTapped: _onTabTapped,
+            child: DashboardPage(),
+          ),
+
+          // Event Page
+          BaseLayout(
+            currentIndex: _currentIndex,
+            onTabTapped: _onTabTapped,
+            child: Center(
+              child: Text(
+                "Event Page",
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _getPage(int index) {
-    switch (index) {
-      case 0:
-        return Center(
-          child: Text(
-            "Settings Page",
-            style: Theme.of(context).textTheme.bodyLarge, 
-          ),
-        );
-      case 1:
-        return DashboardPage(); // Navigate to Dashboard Page
-      case 2:
-        return Center(
-          child: Text(
-            "Event Page",
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
-        );
-      default:
-        return Center(
-          child: Text(
-            "Page Not Found",
-            style: Theme.of(context).textTheme.bodyLarge, 
-          ),
-        );
-    }
+  void _onTabTapped(int index) {
+    // Navigate to the selected page using bottom navigation bar
+    setState(() {
+      _currentIndex = index; // Update index
+      _pageController.animateToPage(
+        index,
+        duration: Duration(milliseconds: 300), // Smooth transition duration
+        curve: Curves.easeInOut, // Smooth transition curve
+      );
+    });
   }
 }
