@@ -6,12 +6,19 @@ import 'app_colors.dart';
 void main() {
   runApp(MyApp());
 }
-
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        fontFamily: 'Nunito', // Apply Nunito font globally
+        textTheme: TextTheme(
+          displayLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.text), // Header font
+          bodyLarge: TextStyle(fontSize: 18, color: AppColors.text), // Large size font
+          bodyMedium: TextStyle(fontSize: 16, color: AppColors.text), // Medium size font
+      ),
+      ),
       home: MainApp(),
     );
   }
@@ -27,7 +34,6 @@ class _MainAppState extends State<MainApp> {
 
   @override
   Widget build(BuildContext context) {
-    // Return the appropriate page based on the selected index
     return BaseLayout(
       currentIndex: _currentIndex,
       onTabTapped: (index) {
@@ -39,30 +45,29 @@ class _MainAppState extends State<MainApp> {
     );
   }
 
-  // Helper function to get the content for each page
   Widget _getPage(int index) {
     switch (index) {
       case 0:
         return Center(
           child: Text(
             "Settings Page",
-            style: TextStyle(color: AppColors.text, fontSize: 24),
+            style: Theme.of(context).textTheme.bodyLarge, 
           ),
         );
       case 1:
-        return DashboardPage(); // Use the DashboardPage
+        return DashboardPage(); // Navigate to Dashboard Page
       case 2:
         return Center(
           child: Text(
             "Event Page",
-            style: TextStyle(color: AppColors.text, fontSize: 24),
+            style: Theme.of(context).textTheme.bodyLarge,
           ),
         );
       default:
         return Center(
           child: Text(
             "Page Not Found",
-            style: TextStyle(color: AppColors.text, fontSize: 24),
+            style: Theme.of(context).textTheme.bodyLarge, 
           ),
         );
     }
