@@ -6,4 +6,5 @@ class AppColors {
   static const Color text = Color(0xFFD6677A); // Text Color
   static const Color subAlt = Color(0xFF263041); // Secondary background
   static const Color sub = Color(0xFF4A768D); // sub color
+  static const Color pagen = Color(0xFF9C4A6C); // page name color
 }
