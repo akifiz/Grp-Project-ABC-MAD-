@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dashboard_page.dart';
+import 'events_page.dart';
 import 'base_layout.dart';
 import 'app_colors.dart';
 
@@ -58,7 +59,7 @@ class _MainAppState extends State<MainApp> {
             onTabTapped: _onTabTapped,
             child: Center(
               child: Text(
-                "Settings Page",
+                "Event Page",
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
             ),
@@ -75,12 +76,7 @@ class _MainAppState extends State<MainApp> {
           BaseLayout(
             currentIndex: _currentIndex,
             onTabTapped: _onTabTapped,
-            child: Center(
-              child: Text(
-                "Event Page",
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-            ),
+            child: EventsPage(),
           ),
         ],
       ),
