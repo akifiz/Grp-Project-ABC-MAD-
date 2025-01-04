@@ -59,7 +59,7 @@ class _MainAppState extends State<MainApp> {
             onTabTapped: _onTabTapped,
             child: Center(
               child: Text(
-                "Event Page",
+                "Settings Page",
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
             ),
