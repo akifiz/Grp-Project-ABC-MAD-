@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'event_details.dart';
+import 'app_colors.dart';
 
 class EventsPage extends StatelessWidget {
   @override
@@ -7,9 +8,17 @@ class EventsPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children:[
-        Text(
-          "Event Page",
-          style: Theme.of(context).textTheme.bodyLarge,
+        Padding(
+          padding: const EdgeInsets.only(top: 16.0),
+          child: Text(
+            'Events',
+            style: const TextStyle(
+              fontSize: 34,
+              fontWeight: FontWeight.bold,
+              color: AppColors.pagen,
+            ),
+            textAlign: TextAlign.center,
+          ),
         ),
         SizedBox(height: 10),
         TileButton(
