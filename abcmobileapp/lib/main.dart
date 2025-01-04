@@ -3,7 +3,6 @@ import 'dashboard_page.dart';
 import 'events_page.dart';
 import 'base_layout.dart';
 import 'app_colors.dart';
-import 'event_page.dart';
 void main() {
   runApp(MyApp());
 }
