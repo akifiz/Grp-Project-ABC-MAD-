@@ -3,7 +3,7 @@ import 'dashboard_page.dart';
 import 'events_page.dart';
 import 'base_layout.dart';
 import 'app_colors.dart';
-
+import 'event_page.dart';
 void main() {
   runApp(MyApp());
 }
@@ -41,6 +41,7 @@ class _MainAppState extends State<MainApp> {
     super.dispose();
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,10 +49,10 @@ class _MainAppState extends State<MainApp> {
         controller: _pageController,
         onPageChanged: (index) {
           setState(() {
-            _currentIndex = index; // Sync current index with swipe
+            _currentIndex = index;
           });
         },
-        // BOTTOM NAVIGATION BAR
+        // Bottom Navigation Bar with each respective button
         children: [
           // Settings Page
           BaseLayout(
@@ -82,11 +83,13 @@ class _MainAppState extends State<MainApp> {
       ),
     );
   }
-
+      
+    
+  
+  // Navigation by using buttons on bottom navigation bar
   void _onTabTapped(int index) {
-    // Navigate to the selected page using bottom navigation bar
     setState(() {
-      _currentIndex = index; // Update index
+      _currentIndex = index; // Update index depending on which page
       _pageController.animateToPage(
         index,
         duration: Duration(milliseconds: 300), // Smooth transition duration
