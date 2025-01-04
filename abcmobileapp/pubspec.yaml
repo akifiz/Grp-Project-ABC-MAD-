@@ -17,12 +17,14 @@ dev_dependencies:
   flutter_lints: ^4.0.0
 
 flutter:
-  fonts:
-    - family: Nunito
-      fonts:
-        - asset: assets/fonts/Nunito-Regular.ttf
-        - asset: assets/fonts/Nunito-Bold.ttf
-          weight: 700
-        - asset: assets/fonts/Nunito-Italic.ttf
-          style: italic
   uses-material-design: true
+  #fonts:
+    #- family: Nunito
+      #fonts:
+        #- asset: assets/fonts/Nunito-Regular.ttf
+        #- asset: assets/fonts/Nunito-Bold.ttf
+          #weight: 700
+        #- asset: assets/fonts/Nunito-Italic.ttf
+          #style: italic
+
+
