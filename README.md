@@ -19,10 +19,28 @@
 
 ## Database Structure (for now)
 
-table LIST_OF_EVENTS: 
+# table LIST_OF_EVENTS  
 - eventId  
 - event title  
 - userId [...]  
 - bool: hasEventName [...] (optional)  
 - finalBalance [idIndexFrom, idIndexTo, amount...] (length will be C(n,2) at max)  
 - pending expenses [expenseId...]
+
+# table EXPENSES  
+- expenseId
+- eventId
+- userId [...]
+- who paid (index of userId)
+- total
+- split [id, amount...]
+- expense title
+- dateTime
+- isSettled
+- subDescription (optional)
+
+# table USERS
+- userId
+- default name
+- event name [eventId, name] (optional)
+- profilePic
