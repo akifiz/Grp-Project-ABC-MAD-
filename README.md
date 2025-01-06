@@ -20,17 +20,17 @@
 ## Database Structure (for now)
 
 ### table LIST_OF_EVENTS  
-- eventId  
+- PK eventId  
 - event title  
-- userId [...]  
+- FK userId [...]  
 - bool: hasEventName [...] (optional)  
 - finalBalance [idIndexFrom, idIndexTo, amount...] (length will be C(n,2) at max)  
-- pending expenses [expenseId...]
+- FK pending expenses [expenseId...]
 
 ### table EXPENSES  
-- expenseId
-- eventId
-- userId [...]
+- PK expenseId
+- FK eventId
+- FK userId [...]
 - who paid (index of userId)
 - total
 - split [id, amount...]
@@ -40,7 +40,7 @@
 - subDescription (optional)
 
 ### table USERS
-- userId
+- PK userId
 - default name
 - event name [eventId, name] (optional)
 - profilePic
