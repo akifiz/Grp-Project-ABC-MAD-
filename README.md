@@ -15,5 +15,6 @@
 3a. type these commands once inside the project folder  
 > ..> flutter create .  
 > ..> flutter pub get  
-> ..> flutter run  
+> ..> flutter run
+<br>
 3b. or use vscode extensions gui to create flutter project, get dependencies, and run
