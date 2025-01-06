@@ -13,10 +13,10 @@
 1. clone the repo <br>
 2. open the abcmobileapp folder(flutter project folder) in vs code or terminal <br>
 3a. type these commands once inside the project folder: <br>
-> flutter create .
+>flutter create .
 <br>
-> flutter pub get
+>flutter pub get
 <br>
-> flutter run
+>flutter run
 <br>
 3b. or use vscode extensions gui to create flutter project, get dependencies, and run
