@@ -12,7 +12,7 @@
 ## How To Run
 1. clone the repo <br>
 2. open the abcmobileapp folder(flutter project folder) in vs code or terminal <br>
-3a. type these commands once inside the project folder: <br>
+3a. type these commands once inside the project folder  
 > ..> flutter create .  
 > ..> flutter pub get  
 > ..> flutter run  
