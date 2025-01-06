@@ -16,5 +16,4 @@
 > ..> flutter create .  
 > ..> flutter pub get  
 > ..> flutter run  
-<br>
 3b. or use vscode extensions gui to create flutter project, get dependencies, and run
