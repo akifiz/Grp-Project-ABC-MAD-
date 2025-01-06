@@ -22,12 +22,13 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text("Road Trip Expenses"),
         backgroundColor: AppColors.text,
-        foregroundColor: Colors.white,
+        foregroundColor: Colors.white ,
       ),
-      body: Column(
+      body: Column( 
         children: [
           Expanded(
             child: ListView.builder(
@@ -36,7 +37,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               itemBuilder: (context, index) {
                 return ChatBubble(
                   message: _messages[_messages.length - 1 - index],
-                  isSentByMe: index % 2 == 0, // Alternate sender
+                  isSentByMe: true, // don't alternate sender
                 );
               },
             ),
@@ -50,6 +51,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   child: TextField(
                     controller: _messageController,
                     decoration: InputDecoration(
+                      filled: true,
+                      fillColor: AppColors.main,
                       hintText: "Add an expense...",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20),
@@ -60,7 +63,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 ),
                 SizedBox(width: 8),
                 IconButton(
-                  icon: Icon(Icons.send, color: Colors.teal),
+                  icon: Icon(Icons.send, color: AppColors.pagen),
                   onPressed: _sendMessage,
                 ),
               ],
@@ -89,7 +92,7 @@ class ChatBubble extends StatelessWidget {
         margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
         padding: EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isSentByMe ? Colors.teal : Colors.grey[300],
+          color: isSentByMe ? AppColors.sub : const Color.fromARGB(255, 0, 0, 0),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(12),
             topRight: Radius.circular(12),
