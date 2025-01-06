@@ -16,3 +16,13 @@
 > ..> flutter create .  
 > ..> flutter pub get  
 > ..> flutter run
+
+## Database Structure (for now)
+
+table LIST_OF_EVENTS: 
+- eventId  
+- event title  
+- userId [...]  
+- bool: hasEventName [...] (optional)  
+- finalBalance [idIndexFrom, idIndexTo, amount...] (length will be C(n,2) at max)  
+- pending expenses [expenseId...]
