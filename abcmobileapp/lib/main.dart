@@ -1,8 +1,11 @@
+// main.dart
 import 'package:flutter/material.dart';
 import 'dashboard_page.dart';
 import 'events_page.dart';
 import 'base_layout.dart';
 import 'app_colors.dart';
+import 'event_model.dart'; 
+
 void main() {
   runApp(MyApp());
 }
@@ -13,11 +16,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        fontFamily: 'Nunito', // Apply Nunito font globally
+        fontFamily: 'Nunito',
         textTheme: TextTheme(
-          displayLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.text), // Header font
-          bodyLarge: TextStyle(fontSize: 18, color: AppColors.text), // Large size font
-          bodyMedium: TextStyle(fontSize: 16, color: AppColors.text), // Medium size font
+          displayLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppColors.text),
+          bodyLarge: TextStyle(fontSize: 18, color: AppColors.text),
+          bodyMedium: TextStyle(fontSize: 16, color: AppColors.text),
         ),
       ),
       home: MainApp(),
@@ -31,15 +34,22 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
-  int _currentIndex = 1; // Default to "Dashboard" tab
-  final PageController _pageController = PageController(initialPage: 1); // Controller for full-screen swipe navigation
-
+  int _currentIndex = 1;
+  final PageController _pageController = PageController(initialPage: 1);
+  List<Event> events = []; // Add this to store events
+  
   @override
   void dispose() {
-    _pageController.dispose(); // Clean up PageController when not in use
+    _pageController.dispose();
     super.dispose();
   }
 
+  // Add this function to handle new events
+  void _addEvent(Event event) {
+    setState(() {
+      events.add(event);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,9 +61,7 @@ class _MainAppState extends State<MainApp> {
             _currentIndex = index;
           });
         },
-        // Bottom Navigation Bar with each respective button
         children: [
-          // Settings Page
           BaseLayout(
             currentIndex: _currentIndex,
             onTabTapped: _onTabTapped,
@@ -64,35 +72,28 @@ class _MainAppState extends State<MainApp> {
               ),
             ),
           ),
-
-          // Dashboard Page
           BaseLayout(
             currentIndex: _currentIndex,
             onTabTapped: _onTabTapped,
-            child: DashboardPage(),
+            child: DashboardPage(events: events), // Pass events to Dashboard
           ),
-
-          // Event Page
           BaseLayout(
             currentIndex: _currentIndex,
             onTabTapped: _onTabTapped,
-            child: EventsPage(),
+            child: EventsPage(onEventAdded: _addEvent), // Pass callback
           ),
         ],
       ),
     );
   }
-      
-    
   
-  // Navigation by using buttons on bottom navigation bar
   void _onTabTapped(int index) {
     setState(() {
-      _currentIndex = index; // Update index depending on which page
+      _currentIndex = index;
       _pageController.animateToPage(
         index,
-        duration: Duration(milliseconds: 300), // Smooth transition duration
-        curve: Curves.easeInOut, // Smooth transition curve
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
       );
     });
   }

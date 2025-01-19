@@ -1,35 +1,52 @@
+// dashboard_page.dart
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
+import 'event_model.dart'; // Add this new import
 
 class DashboardPage extends StatelessWidget {
-  // List of expenses (people we owe money to)
-  final List<Map<String, String>> expenses = [
-    {"Name": "Alice ALI KABAKARA", "Event": "Birthday Party", "Amount": "50"},
-    {"Name": "Bob", "Event": "Wedding", "Amount": "100"},
-    {"Name": "Charlie", "Event": "Conference", "Amount": "75"},
-    {"Name": "Derek", "Event": "Dinner", "Amount": "30"},
-    {"Name": "Eve", "Event": "Concert", "Amount": "120"},
-  ];
+  final List<Event> events; // Add this
 
-  // List of debtors (people who owe us money)
-  final List<Map<String, String>> debtors = [
-    {"Name": "Frank", "Event": "Project", "Amount": "200"},
-    {"Name": "Grace", "Event": "Lunch", "Amount": "50"},
-    {"Name": "Hannah", "Event": "Conference", "Amount": "150"},
-    {"Name": "Ian", "Event": "Workshop", "Amount": "100"},
-    {"Name": "Jack", "Event": "Seminar", "Amount": "300"},
-  ];
+  const DashboardPage({
+    Key? key,
+    required this.events,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // Convert events to expense lists
+    final List<Map<String, String>> expenses = [];
+    final List<Map<String, String>> debtors = [];
+    
+    // Populate expenses and debtors from events
+    for (var event in events) {
+      for (var expense in event.expenses) {
+        expenses.add({
+          "Name": expense.paidBy,
+          "Event": event.name,
+          "Amount": expense.amount.toString(),
+        });
+        
+        // Calculate individual shares
+        double share = expense.amount / expense.sharedWith.length;
+        for (var person in expense.sharedWith) {
+          if (person != expense.paidBy) {
+            debtors.add({
+              "Name": person,
+              "Event": event.name,
+              "Amount": share.toString(),
+            });
+          }
+        }
+      }
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Page title
         Padding(
           padding: const EdgeInsets.only(top: 16.0),
           child: Text(
-            'Dashboard',
+            'DASHBOARD',
             style: const TextStyle(
               fontSize: 34,
               fontWeight: FontWeight.bold,
@@ -40,54 +57,65 @@ class DashboardPage extends StatelessWidget {
         ),
         const SizedBox(height: 20),
 
-        // Section title: Your Expenses
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Text(
-            'Your Expenses',
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: AppColors.text,
+        if (expenses.isEmpty && debtors.isEmpty)
+          Expanded(
+            child: Center(
+              child: Text(
+                'No expenses yet.\nCreate an event to start tracking!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: AppColors.main,
+                  fontSize: 18,
+                ),
+              ),
             ),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        const SizedBox(height: 10),
-
-        // First table: Expenses (People We Owe)
-        _buildScrollableTable(
-          data: expenses,
-          columnName: 'Amount',
-        ),
-
-        const SizedBox(height: 40), // Space between tables
-
-        // Section title: Debtors
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Text(
-            'Debtors',
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: AppColors.text,
+          )
+        else ...[
+          // Your Expenses Section
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              'Your Expenses',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: AppColors.text,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
           ),
-        ),
-        const SizedBox(height: 10),
+          const SizedBox(height: 10),
+          _buildScrollableTable(
+            data: expenses,
+            columnName: 'Amount',
+          ),
 
-        // Second table: Debtors (People Who Owe Us)
-        _buildScrollableTable(
-          data: debtors,
-          columnName: 'Amount',
-        ),
+          const SizedBox(height: 40),
+
+          // Debtors Section
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              'Debtors',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: AppColors.text,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: 10),
+          _buildScrollableTable(
+            data: debtors,
+            columnName: 'Amount',
+          ),
+        ],
       ],
     );
   }
 
-  // Build a scrollable table with a fixed height
+  // 
   Widget _buildScrollableTable({
     required List<Map<String, String>> data,
     required String columnName,
@@ -96,9 +124,8 @@ class DashboardPage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 32.0),
       child: Column(
         children: [
-          // Scrollable table body
           Container(
-            height: 240, // Fixed height for 4 rows + scrollbar space
+            height: 240,
             child: SingleChildScrollView(
               child: DataTable(
                 headingRowColor: MaterialStateProperty.resolveWith(
@@ -127,13 +154,13 @@ class DashboardPage extends StatelessWidget {
                   ),
                   DataColumn(
                     label: Text(
-                      'Amount\nOwed', // Break into two lines
+                      'Amount\nOwed',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                         color: AppColors.text,
                       ),
-                      textAlign: TextAlign.center, // Center-align text
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ],
@@ -150,8 +177,6 @@ class DashboardPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-
-          // Total row (static, not scrollable)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -178,26 +203,24 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-  // Method to build individual cells with consistent styling
-DataCell _buildCell(String content, {FontWeight? fontWeight}) {
-  return DataCell(
-    SizedBox(
-      width: double.infinity, // Ensures the text occupies available space
-      child: Text(
-        content,
-        style: TextStyle(
-          color: AppColors.main,
-          fontSize: 14,
-          fontWeight: fontWeight ?? FontWeight.normal,
+  DataCell _buildCell(String content, {FontWeight? fontWeight}) {
+    return DataCell(
+      SizedBox(
+        width: double.infinity,
+        child: Text(
+          content,
+          style: TextStyle(
+            color: AppColors.main,
+            fontSize: 14,
+            fontWeight: fontWeight ?? FontWeight.normal,
+          ),
+          softWrap: true,
+          overflow: TextOverflow.visible,
         ),
-        softWrap: true, // Enables line wrapping
-        overflow: TextOverflow.visible, // Ensures all text is visible
       ),
-    ),
-  );
-}
+    );
+  }
 
-  // Calculate the total amount for a table
   double _calculateTotal(List<Map<String, String>> data, String columnName) {
     double total = 0;
     for (var entry in data) {
