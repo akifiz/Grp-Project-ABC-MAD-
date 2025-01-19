@@ -20,27 +20,29 @@
 ## Database Structure (for now)
 
 ### table LIST_OF_EVENTS  
-- PK eventId  
-- event title  
-- FK userId [...]  
+- int:PK eventId  
+- string:event title  
+- int:FK userId [...]  
 - bool: hasEventName [...] (optional)  
-- finalBalance [idIndexFrom, idIndexTo, amount...] (length will be C(n,2) at max)  
-- FK pending expenses [expenseId...]
+- map:finalBalance [int:idIndexFrom,int:idIndexTo,float:amount...] (length will be C(n,2) at max)  
+- int:FK pending expenses [int:expenseId...]
 
 ### table EXPENSES  
-- PK expenseId
-- FK eventId
-- FK userId [...]
-- who paid (index of userId)
-- total
-- split [id, amount...]
-- expense title
-- dateTime
-- isSettled
-- subDescription (optional)
+- int:PK expenseId
+- int:FK eventId
+- int:FK userId [...]
+- int:who paid (index of userId)
+- float:total
+- map:split [int:id, float:amount...]
+- string:expense title
+- :dateTime
+- bool:isSettled
+- string:subDescription
 
 ### table USERS
-- PK userId
-- default name
-- event name [eventId, name] (optional)
-- profilePic
+- int:PK userId
+- string:default name
+- map:event name [eventId, name] (not important)
+- image:profilePic
+- string: email
+- 
