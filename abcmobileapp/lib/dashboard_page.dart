@@ -1,44 +1,77 @@
-// dashboard_page.dart
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
-import 'event_model.dart'; // Add this new import
+import 'model.dart';
 
 class DashboardPage extends StatelessWidget {
-  final List<Event> events; // Add this
+  final List<Event> events;
 
   const DashboardPage({
     Key? key,
     required this.events,
   }) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    // Convert events to expense lists
-    final List<Map<String, String>> expenses = [];
-    final List<Map<String, String>> debtors = [];
-    
-    // Populate expenses and debtors from events
+  List<Map<String, dynamic>> _processExpenses() {
+    final List<Map<String, dynamic>> expenses = [];
+    double totalAmount = 0;
+
     for (var event in events) {
       for (var expense in event.expenses) {
-        expenses.add({
-          "Name": expense.paidBy,
-          "Event": event.name,
-          "Amount": expense.amount.toString(),
-        });
-        
         // Calculate individual shares
         double share = expense.amount / expense.sharedWith.length;
+        
+        // Add expense for the person who paid
+        expenses.add({
+          'type': 'paid',
+          'name': expense.paidBy,
+          'event': event.name,
+          'amount': expense.amount,
+          'date': expense.date,
+        });
+        totalAmount += expense.amount;
+
+        // Add entries for people who owe money
         for (var person in expense.sharedWith) {
           if (person != expense.paidBy) {
-            debtors.add({
-              "Name": person,
-              "Event": event.name,
-              "Amount": share.toString(),
+            expenses.add({
+              'type': 'owed',
+              'name': person,
+              'event': event.name,
+              'amount': share,
+              'date': expense.date,
             });
           }
         }
       }
     }
+
+    // Sort expenses by date
+    expenses.sort((a, b) => b['date'].compareTo(a['date']));
+    return expenses;
+  }
+
+  Map<String, double> _calculateBalances() {
+    final Map<String, double> balances = {};
+
+    for (var event in events) {
+      for (var expense in event.expenses) {
+        // Add to payer's balance
+        balances[expense.paidBy] = (balances[expense.paidBy] ?? 0) + expense.amount;
+
+        // Subtract shares from participants
+        double share = expense.amount / expense.sharedWith.length;
+        for (var person in expense.sharedWith) {
+          balances[person] = (balances[person] ?? 0) - share;
+        }
+      }
+    }
+
+    return balances;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final expenses = _processExpenses();
+    final balances = _calculateBalances();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -57,11 +90,11 @@ class DashboardPage extends StatelessWidget {
         ),
         const SizedBox(height: 20),
 
-        if (expenses.isEmpty && debtors.isEmpty)
+        if (events.isEmpty)
           Expanded(
             child: Center(
               child: Text(
-                'No expenses yet.\nCreate an event to start tracking!',
+                'No events yet.\nCreate an event to start tracking expenses!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: AppColors.main,
@@ -71,11 +104,11 @@ class DashboardPage extends StatelessWidget {
             ),
           )
         else ...[
-          // Your Expenses Section
+          // Balances Section
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Text(
-              'Your Expenses',
+              'Current Balances',
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
@@ -85,18 +118,54 @@ class DashboardPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          _buildScrollableTable(
-            data: expenses,
-            columnName: 'Amount',
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 32.0),
+            height: 120,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: balances.length,
+              itemBuilder: (context, index) {
+                String person = balances.keys.elementAt(index);
+                double balance = balances[person]!;
+                return Card(
+                  color: AppColors.subAlt,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          person,
+                          style: TextStyle(
+                            color: AppColors.main,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'RM ${balance.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            color: balance >= 0 ? Colors.green : Colors.red,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
 
-          const SizedBox(height: 40),
+          const SizedBox(height: 20),
 
-          // Debtors Section
+          // Recent Transactions Section
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Text(
-              'Debtors',
+              'Recent Transactions',
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
@@ -106,126 +175,43 @@ class DashboardPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          _buildScrollableTable(
-            data: debtors,
-            columnName: 'Amount',
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+              child: ListView.builder(
+                itemCount: expenses.length,
+                itemBuilder: (context, index) {
+                  final expense = expenses[index];
+                  return Card(
+                    color: AppColors.subAlt,
+                    child: ListTile(
+                      title: Text(
+                        expense['event'],
+                        style: TextStyle(
+                          color: AppColors.main,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: Text(
+                        '${expense['name']} ${expense['type'] == 'paid' ? 'paid' : 'owes'} RM${expense['amount'].toStringAsFixed(2)}',
+                        style: TextStyle(
+                          color: AppColors.main.withOpacity(0.7),
+                        ),
+                      ),
+                      trailing: Text(
+                        expense['date'].toString().split(' ')[0],
+                        style: TextStyle(
+                          color: AppColors.main,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
           ),
         ],
       ],
     );
-  }
-
-  // 
-  Widget _buildScrollableTable({
-    required List<Map<String, String>> data,
-    required String columnName,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 32.0),
-      child: Column(
-        children: [
-          Container(
-            height: 240,
-            child: SingleChildScrollView(
-              child: DataTable(
-                headingRowColor: MaterialStateProperty.resolveWith(
-                  (states) => AppColors.sub.withOpacity(0.8),
-                ),
-                columns: const [
-                  DataColumn(
-                    label: Text(
-                      'Name',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: AppColors.text,
-                      ),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Text(
-                      'Event',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: AppColors.text,
-                      ),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Text(
-                      'Amount\nOwed',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: AppColors.text,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
-                rows: data.map((entry) {
-                  return DataRow(
-                    cells: [
-                      _buildCell(entry['Name'] ?? ''),
-                      _buildCell(entry['Event'] ?? ''),
-                      _buildCell('RM${entry[columnName] ?? ''}'),
-                    ],
-                  );
-                }).toList(),
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Total',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: AppColors.text,
-                ),
-              ),
-              Text(
-                'RM${_calculateTotal(data, columnName).toStringAsFixed(2)}',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: AppColors.text,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  DataCell _buildCell(String content, {FontWeight? fontWeight}) {
-    return DataCell(
-      SizedBox(
-        width: double.infinity,
-        child: Text(
-          content,
-          style: TextStyle(
-            color: AppColors.main,
-            fontSize: 14,
-            fontWeight: fontWeight ?? FontWeight.normal,
-          ),
-          softWrap: true,
-          overflow: TextOverflow.visible,
-        ),
-      ),
-    );
-  }
-
-  double _calculateTotal(List<Map<String, String>> data, String columnName) {
-    double total = 0;
-    for (var entry in data) {
-      total += double.tryParse(entry[columnName] ?? '0') ?? 0;
-    }
-    return total;
   }
 }
