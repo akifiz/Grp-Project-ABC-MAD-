@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
+import 'model.dart';
 
 class EventDetailsPage extends StatefulWidget {
+  final Event event;
+  final Function(Event) onEventUpdated;
+
+  const EventDetailsPage({
+    Key? key,
+    required this.event,
+    required this.onEventUpdated,
+  }) : super(key: key);
+
   @override
   _EventDetailsPageState createState() => _EventDetailsPageState();
 }
@@ -24,11 +34,11 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text("Road Trip Expenses"),
+        title: Text(widget.event.name),
         backgroundColor: AppColors.text,
-        foregroundColor: Colors.white ,
+        foregroundColor: Colors.white,
       ),
-      body: Column( 
+      body: Column(
         children: [
           Expanded(
             child: ListView.builder(

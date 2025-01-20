@@ -1,10 +1,11 @@
-// main.dart
 import 'package:flutter/material.dart';
 import 'dashboard_page.dart';
 import 'events_page.dart';
 import 'base_layout.dart';
 import 'app_colors.dart';
-import 'event_model.dart'; 
+import 'model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 void main() {
   runApp(MyApp());
@@ -36,7 +37,13 @@ class MainApp extends StatefulWidget {
 class _MainAppState extends State<MainApp> {
   int _currentIndex = 1;
   final PageController _pageController = PageController(initialPage: 1);
-  List<Event> events = []; // Add this to store events
+  List<Event> events = [];
+  
+  @override
+  void initState() {
+    super.initState();
+    _loadEvents();
+  }
   
   @override
   void dispose() {
@@ -44,11 +51,46 @@ class _MainAppState extends State<MainApp> {
     super.dispose();
   }
 
-  // Add this function to handle new events
+  Future<void> _loadEvents() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? eventsJson = prefs.getString('events');
+      if (eventsJson != null) {
+        final List<dynamic> decodedEvents = jsonDecode(eventsJson);
+        setState(() {
+          events = decodedEvents.map((eventMap) => Event.fromJson(eventMap)).toList();
+        });
+      }
+    } catch (e) {
+      print('Error loading events: $e');
+    }
+  }
+
+  Future<void> _saveEvents() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String eventsJson = jsonEncode(events.map((event) => event.toJson()).toList());
+      await prefs.setString('events', eventsJson);
+    } catch (e) {
+      print('Error saving events: $e');
+    }
+  }
+
   void _addEvent(Event event) {
     setState(() {
       events.add(event);
     });
+    _saveEvents();
+  }
+
+  void _updateEvent(Event event) {
+    final index = events.indexWhere((e) => e.id == event.id);
+    if (index != -1) {
+      setState(() {
+        events[index] = event;
+      });
+      _saveEvents();
+    }
   }
 
   @override
@@ -75,12 +117,16 @@ class _MainAppState extends State<MainApp> {
           BaseLayout(
             currentIndex: _currentIndex,
             onTabTapped: _onTabTapped,
-            child: DashboardPage(events: events), // Pass events to Dashboard
+            child: DashboardPage(events: events),
           ),
           BaseLayout(
             currentIndex: _currentIndex,
             onTabTapped: _onTabTapped,
-            child: EventsPage(onEventAdded: _addEvent), // Pass callback
+            child: EventsPage(
+              events: events,
+              onEventAdded: _addEvent,
+              onEventUpdated: _updateEvent,
+            ),
           ),
         ],
       ),

@@ -1,28 +1,55 @@
+// events_page.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'event_details.dart';
 import 'app_colors.dart';
-import 'event_model.dart';
+import 'model.dart';
 import 'tilebutton.dart';
+
 class EventsPage extends StatefulWidget {
+  final List<Event> events;
   final Function(Event) onEventAdded;
-  
-  const EventsPage({Key? key, required this.onEventAdded}) : super(key: key);
-  
+  final Function(Event) onEventUpdated;
+
+  const EventsPage({
+    Key? key,
+    required this.events,
+    required this.onEventAdded,
+    required this.onEventUpdated,
+  }) : super(key: key);
+
   @override
   _EventsPageState createState() => _EventsPageState();
 }
 
-
 class _EventsPageState extends State<EventsPage> {
-  List<Event> events = [];
+  final _formKey = GlobalKey<FormState>();
+  final _peopleController = TextEditingController();
+  final _nameController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _peopleController.text = '2'; // Default value
+  }
+
+  @override
+  void dispose() {
+    _peopleController.dispose();
+    _nameController.dispose();
+    super.dispose();
+  }
 
   void _showCreateEventDialog() {
-    String eventName = '';
-    int numberOfPeople = 2;
     DateTime selectedDate = DateTime.now();
+    
+    // Reset controllers
+    _nameController.clear();
+    _peopleController.text = '2';
 
     showDialog(
       context: context,
+      barrierDismissible: false, // Must use buttons to close
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: AppColors.background,
@@ -30,88 +57,143 @@ class _EventsPageState extends State<EventsPage> {
             'Create New Event',
             style: TextStyle(color: AppColors.text),
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                style: TextStyle(color: AppColors.main),
-                decoration: InputDecoration(
-                  labelText: 'Event Name',
-                  labelStyle: TextStyle(color: AppColors.text),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.text),
-                  ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.text),
-                  ),
-                ),
-                onChanged: (value) => eventName = value,
-              ),
-              SizedBox(height: 16),
-              Row(
+          content: Form(
+            key: _formKey,
+            child: SingleChildScrollView( // Make scrollable for small screens
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Number of People: ',
+                  TextFormField(
+                    controller: _nameController,
                     style: TextStyle(color: AppColors.main),
-                  ),
-                  DropdownButton<int>(
-                    dropdownColor: AppColors.subAlt,
-                    value: numberOfPeople,
-                    items: List.generate(10, (index) => index + 2)
-                        .map((int value) {
-                      return DropdownMenuItem<int>(
-                        value: value,
-                        child: Text(
-                          value.toString(),
-                          style: TextStyle(color: AppColors.main),
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (int? value) {
-                      setState(() {
-                        numberOfPeople = value ?? 2;
-                      });
+                    decoration: InputDecoration(
+                      labelText: 'Event Name',
+                      labelStyle: TextStyle(color: AppColors.text),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: AppColors.text),
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: AppColors.text),
+                      ),
+                      errorStyle: TextStyle(color: Colors.redAccent),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Please enter an event name';
+                      }
+                      if (value.length > 50) {
+                        return 'Event name too long (max 50 characters)';
+                      }
+                      return null;
                     },
+                    textInputAction: TextInputAction.next,
+                    maxLength: 50,
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    controller: _peopleController,
+                    style: TextStyle(color: AppColors.main),
+                    decoration: InputDecoration(
+                      labelText: 'Number of People',
+                      labelStyle: TextStyle(color: AppColors.text),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: AppColors.text),
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: AppColors.text),
+                      ),
+                      errorStyle: TextStyle(color: Colors.redAccent),
+                      hintText: 'Enter number of participants',
+                      hintStyle: TextStyle(color: AppColors.main.withOpacity(0.5)),
+                    ),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(4), // Reasonable limit
+                    ],
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter number of people';
+                      }
+                      final number = int.tryParse(value);
+                      if (number == null) {
+                        return 'Please enter a valid number';
+                      }
+                      if (number < 2) {
+                        return 'Minimum 2 people required';
+                      }
+                      if (number > 1000) {
+                        return 'Maximum 1000 people allowed';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Icon(Icons.calendar_today, color: AppColors.text),
+                      SizedBox(width: 8),
+                      Text(
+                        'Event Date:',
+                        style: TextStyle(
+                          color: AppColors.text,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  InkWell(
+                    onTap: () async {
+                      final DateTime? picked = await showDatePicker(
+                        context: context,
+                        initialDate: selectedDate,
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2101),
+                        builder: (context, child) {
+                          return Theme(
+                            data: Theme.of(context).copyWith(
+                              colorScheme: ColorScheme.dark(
+                                primary: AppColors.text,
+                                surface: AppColors.background,
+                                onSurface: AppColors.main,
+                              ),
+                              dialogBackgroundColor: AppColors.background,
+                            ),
+                            child: child!,
+                          );
+                        },
+                      );
+                      if (picked != null && picked != selectedDate) {
+                        setState(() {
+                          selectedDate = picked;
+                        });
+                      }
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: AppColors.text),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        selectedDate.toString().split(' ')[0],
+                        style: TextStyle(color: AppColors.main),
+                      ),
+                    ),
                   ),
                 ],
               ),
-              SizedBox(height: 16),
-              TextButton(
-                onPressed: () async {
-                  final DateTime? picked = await showDatePicker(
-                    context: context,
-                    initialDate: selectedDate,
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2101),
-                    builder: (context, child) {
-                      return Theme(
-                        data: Theme.of(context).copyWith(
-                          colorScheme: ColorScheme.dark(
-                            primary: AppColors.text,
-                            surface: AppColors.background,
-                            onSurface: AppColors.main,
-                          ),
-                        ),
-                        child: child!,
-                      );
-                    },
-                  );
-                  if (picked != null) {
-                    setState(() {
-                      selectedDate = picked;
-                    });
-                  }
-                },
-                child: Text(
-                  'Date: ${selectedDate.toString().split(' ')[0]}',
-                  style: TextStyle(color: AppColors.text),
-                ),
-              ),
-            ],
+            ),
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () {
+                _nameController.clear();
+                _peopleController.text = '2';
+                Navigator.pop(context);
+              },
               child: Text(
                 'Cancel',
                 style: TextStyle(color: AppColors.text),
@@ -119,17 +201,23 @@ class _EventsPageState extends State<EventsPage> {
             ),
             TextButton(
               onPressed: () {
-                if (eventName.isNotEmpty) {
+                if (_formKey.currentState!.validate()) {
                   final newEvent = Event(
-                    name: eventName,
+                    name: _nameController.text.trim(),
                     date: selectedDate,
-                    numberOfPeople: numberOfPeople,
+                    numberOfPeople: int.parse(_peopleController.text),
                   );
-                  setState(() {
-                    events.add(newEvent);
-                  });
                   widget.onEventAdded(newEvent);
                   Navigator.pop(context);
+                  
+                  // Show confirmation
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Event created successfully!'),
+                      backgroundColor: Colors.green,
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
                 }
               },
               child: Text(
@@ -163,30 +251,109 @@ class _EventsPageState extends State<EventsPage> {
         Expanded(
           child: Stack(
             children: [
-              // Event List
-              ListView.builder(
-                padding: EdgeInsets.all(16),
-                itemCount: events.length,
-                itemBuilder: (context, index) {
-                  final event = events[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: TileButton(
-                      text: "${event.name}\n${event.date.toString().split(' ')[0]}\n${event.numberOfPeople} People",
-                      icon: Icons.event,
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EventDetailsPage(),
+              if (widget.events.isEmpty)
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.event_note,
+                        size: 64,
+                        color: AppColors.main.withOpacity(0.5),
+                      ),
+                      SizedBox(height: 16),
+                      Text(
+                        'No events yet.\nTap + to create a new event!',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: AppColors.main,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              else
+                ListView.builder(
+                  padding: EdgeInsets.all(16),
+                  itemCount: widget.events.length,
+                  itemBuilder: (context, index) {
+                    final event = widget.events[index];
+                    return Dismissible(
+                      key: Key(event.id),
+                      background: Container(
+                        color: Colors.red,
+                        alignment: Alignment.centerRight,
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: Icon(Icons.delete, color: Colors.white),
+                      ),
+                      direction: DismissDirection.endToStart,
+                      confirmDismiss: (direction) async {
+                        return await showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              backgroundColor: AppColors.background,
+                              title: Text(
+                                'Delete Event',
+                                style: TextStyle(color: AppColors.text),
+                              ),
+                              content: Text(
+                                'Are you sure you want to delete this event?',
+                                style: TextStyle(color: AppColors.main),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(false),
+                                  child: Text(
+                                    'Cancel',
+                                    style: TextStyle(color: AppColors.text),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(true),
+                                  child: Text(
+                                    'Delete',
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      onDismissed: (direction) {
+                        // You'll need to add onEventDeleted callback
+                        // widget.onEventDeleted(event);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Event deleted'),
+                            backgroundColor: Colors.red,
+                            duration: Duration(seconds: 2),
                           ),
                         );
                       },
-                    ),
-                  );
-                },
-              ),
-              // Floating Action Button
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: TileButton(
+                          text: "${event.name}\n${event.date.toString().split(' ')[0]}\n${event.numberOfPeople} People",
+                          icon: Icons.event,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EventDetailsPage(
+                                  event: event,
+                                  onEventUpdated: widget.onEventUpdated,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                ),
               Positioned(
                 right: 16,
                 bottom: 16,
@@ -194,6 +361,7 @@ class _EventsPageState extends State<EventsPage> {
                   backgroundColor: AppColors.text,
                   onPressed: _showCreateEventDialog,
                   child: Icon(Icons.add, color: AppColors.main),
+                  tooltip: 'Create New Event',
                 ),
               ),
             ],
@@ -203,4 +371,3 @@ class _EventsPageState extends State<EventsPage> {
     );
   }
 }
-
