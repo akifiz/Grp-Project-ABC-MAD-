@@ -38,49 +38,55 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         backgroundColor: AppColors.text,
         foregroundColor: Colors.white,
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              reverse: true, // Messages start from the bottom
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                return ChatBubble(
-                  message: _messages[_messages.length - 1 - index],
-                  isSentByMe: true, // don't alternate sender
-                );
-              },
-            ),
+      body: Column(children: [
+        Expanded(
+          child: ListView.builder(
+            reverse: true, // Messages start from the bottom
+            itemCount: _messages.length,
+            itemBuilder: (context, index) {
+              return ChatBubble(
+                message: _messages[_messages.length - 1 - index],
+                isSentByMe: true, // don't alternate sender
+              );
+            },
           ),
-          Divider(height: 1),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: AppColors.main,
-                      hintText: "Add an expense...",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 8),
-                IconButton(
-                  icon: Icon(Icons.send, color: AppColors.pagen),
-                  onPressed: _sendMessage,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+        Divider(height: 1),
+        Container(
+            color: AppColors.text,
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Center(
+                child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                  ElevatedButton(
+                      onPressed: () {}, child: Text("Calculate Balance")),
+                  SizedBox(width: 10),
+                  ElevatedButton(
+                      child: Text("Add an expense"),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Dialog Title'),
+                              content:
+                                  Text('This is the content of the dialog.'),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text('Close'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }),
+                ])))
+      ]),
     );
   }
 }
@@ -102,7 +108,8 @@ class ChatBubble extends StatelessWidget {
         margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
         padding: EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isSentByMe ? AppColors.sub : const Color.fromARGB(255, 0, 0, 0),
+          color:
+              isSentByMe ? AppColors.sub : const Color.fromARGB(255, 0, 0, 0),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(12),
             topRight: Radius.circular(12),
