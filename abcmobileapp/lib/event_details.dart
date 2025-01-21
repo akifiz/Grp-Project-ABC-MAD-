@@ -55,31 +55,31 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           Divider(height: 1),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: AppColors.main,
-                      hintText: "Add an expense...",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16),
+            child: Center(
+        child: ElevatedButton(
+          child: 
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Dialog Title'),
+                  content: Text('This is the content of the dialog.'),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text('Close'),
                     ),
-                  ),
-                ),
-                SizedBox(width: 8),
-                IconButton(
-                  icon: Icon(Icons.send, color: AppColors.pagen),
-                  onPressed: _sendMessage,
-                ),
-              ],
-            ),
+                  ],
+                );
+              },
+            );
           ),
-        ],
+            )
+          )
+        ]
       ),
     );
   }
