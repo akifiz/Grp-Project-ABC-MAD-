@@ -17,14 +17,16 @@ class EventDetailsPage extends StatefulWidget {
 }
 
 class _EventDetailsPageState extends State<EventDetailsPage> {
-  final TextEditingController _messageController = TextEditingController();
+  final _messageController = TextEditingController();
+  final _expenseTitleController = TextEditingController();
   final List<String> _messages = []; // List to store chat messages
 
   void _sendMessage() {
     setState(() {
-      _messages.add("test");
+      _messages.add(_expenseTitleController.text);
     });
     _messageController.clear(); // Clear the input field
+    _expenseTitleController.clear();
   }
 
   @override
@@ -68,9 +70,39 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                           context: context,
                           builder: (BuildContext context) {
                             return AlertDialog(
-                              title: Text('Dialog Title'),
-                              content:
-                                  Text('This is the content of the dialog.'),
+                              title: Text('Record an expense'),
+                              content: Column(children: [
+                                TextFormField(
+                                  controller: _expenseTitleController,
+                                  style: TextStyle(color: Colors.black),
+                                  decoration: InputDecoration(
+                                    labelText: 'Title',
+                                    labelStyle:
+                                        TextStyle(color: AppColors.text),
+                                    enabledBorder: UnderlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: AppColors.text),
+                                    ),
+                                    focusedBorder: UnderlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: AppColors.text),
+                                    ),
+                                    errorStyle:
+                                        TextStyle(color: Colors.redAccent),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.trim().isEmpty) {
+                                      return 'Enter expense title';
+                                    }
+                                    if (value.length > 50) {
+                                      return 'Expense title too long (max 50 characters)';
+                                    }
+                                    return null;
+                                  },
+                                  textInputAction: TextInputAction.next,
+                                  maxLength: 50,
+                                )
+                              ]),
                               actions: <Widget>[
                                 TextButton(
                                   onPressed: () {
@@ -107,7 +139,8 @@ class ExpenseBubble extends StatelessWidget {
       alignment: Alignment.center,
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-        padding: EdgeInsets.symmetric(vertical: height*0.06, horizontal: width*0.4),
+        padding: EdgeInsets.symmetric(
+            vertical: height * 0.06, horizontal: width * 0.4),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [AppColors.text, Colors.lightBlue],
