@@ -21,10 +21,10 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   final List<String> _messages = []; // List to store chat messages
 
   void _sendMessage() {
-      setState(() {
-        _messages.add("test");
-      });
-      _messageController.clear(); // Clear the input field
+    setState(() {
+      _messages.add("test");
+    });
+    _messageController.clear(); // Clear the input field
   }
 
   @override
@@ -101,20 +101,33 @@ class ExpenseBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
     return Align(
       alignment: Alignment.center,
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-        padding: EdgeInsets.symmetric(vertical: 40, horizontal: 200),
+        padding: EdgeInsets.symmetric(vertical: height*0.06, horizontal: width*0.4),
         decoration: BoxDecoration(
-          color:
-              isSentByMe ? AppColors.sub : const Color.fromARGB(255, 0, 0, 0),
+          gradient: LinearGradient(
+            colors: [AppColors.text, Colors.lightBlue],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(12),
             topRight: Radius.circular(12),
             bottomLeft: Radius.circular(12),
             bottomRight: Radius.circular(12),
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              offset: Offset(4, 4), // Shadow direction
+              blurRadius: 10, // Softness of the shadow
+              spreadRadius: 1, // How far the shadow spreads
+            ),
+          ],
         ),
         child: Text(
           message,
