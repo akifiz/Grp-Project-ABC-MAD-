@@ -21,12 +21,10 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   final List<String> _messages = []; // List to store chat messages
 
   void _sendMessage() {
-    if (_messageController.text.isNotEmpty) {
       setState(() {
-        _messages.add(_messageController.text);
+        _messages.add("test");
       });
       _messageController.clear(); // Clear the input field
-    }
   }
 
   @override
@@ -44,7 +42,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             reverse: true, // Messages start from the bottom
             itemCount: _messages.length,
             itemBuilder: (context, index) {
-              return ChatBubble(
+              return ExpenseBubble(
                 message: _messages[_messages.length - 1 - index],
                 isSentByMe: true, // don't alternate sender
               );
@@ -77,6 +75,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                 TextButton(
                                   onPressed: () {
                                     Navigator.of(context).pop();
+                                    _sendMessage();
                                   },
                                   child: Text('Close'),
                                 ),
@@ -91,11 +90,11 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   }
 }
 
-class ChatBubble extends StatelessWidget {
+class ExpenseBubble extends StatelessWidget {
   final String message;
   final bool isSentByMe;
 
-  const ChatBubble({
+  const ExpenseBubble({
     required this.message,
     required this.isSentByMe,
   });
@@ -103,18 +102,18 @@ class ChatBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
+      alignment: Alignment.center,
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-        padding: EdgeInsets.all(12),
+        padding: EdgeInsets.symmetric(vertical: 40, horizontal: 200),
         decoration: BoxDecoration(
           color:
               isSentByMe ? AppColors.sub : const Color.fromARGB(255, 0, 0, 0),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(12),
             topRight: Radius.circular(12),
-            bottomLeft: isSentByMe ? Radius.circular(12) : Radius.zero,
-            bottomRight: isSentByMe ? Radius.zero : Radius.circular(12),
+            bottomLeft: Radius.circular(12),
+            bottomRight: Radius.circular(12),
           ),
         ),
         child: Text(
