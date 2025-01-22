@@ -18,48 +18,4 @@
 > ..> flutter run
 
 ## Database Structure (for now)
-
-Events (collection)  <br>
-  _├── event id (document)<br>
-  ___├──> title<br>
-  ___├──> users id<br>
-  ___├──> final balance<br>
-  _├── event id (document)<br>
-  ___├──> title<br>
-  ___├──> users id<br>
-  ___├──> final balance<br>
-  ..<br>
-<br>
-Expenses (collection)<br>
-  ├── event id (document)<br>
-       ├── expenses (subcollection)<br>
-            ├── expense1 (document)<br>
-                  ├──> title<br>
-                  ├──> amount<br>
-                  ├──> paid by<br>
-                  ├──> split<br>
-                  ├──> dateTime<br>
-                  ├──> isSettled<br>         
-            ├── expense2 (document)<br>
-                  .<br>
-            ..<br>
-  ├── event id (document)<br>
-       ├── expenses (subcollection)<br>
-            ├── expense1 (document)<br>
-            ├── expense2 (document)<br>
-            ..<br>
-        ....<br>
-<br>
-Users (collections)<br>
-  ├── user id (document)<br>
-       ├──> email<br>
-       ├──> default name<br>
-       ├──> event ids<br>
-       ├──> event names<br>
-  ├── user id (document)<br>
-       ├──> email<br>
-       ├──> default name<br>
-       ├──> event ids<br>
-       ├──> event names<br>
-   ..<br>
-<br>
+![image](https://github.com/user-attachments/assets/be56555d-a62d-4fa7-8dff-fee35fcd9475)
