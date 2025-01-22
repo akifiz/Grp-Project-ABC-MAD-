@@ -20,11 +20,11 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   final _messageController = TextEditingController();
   final _expenseTitleController = TextEditingController();
   final _expAmountController = TextEditingController();
-  final List<String> _messages = []; // List to store chat messages
+  final List<String> _expenseTitle = []; // List to store chat messages
 
   void _sendMessage() {
     setState(() {
-      _messages.add(_expenseTitleController.text);
+      _expenseTitle.add(_expenseTitleController.text);
     });
     _messageController.clear(); // Clear the input field
     _expenseTitleController.clear();
@@ -43,11 +43,15 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         Expanded(
           child: ListView.builder(
             reverse: true, // Messages start from the bottom
-            itemCount: _messages.length,
+            itemCount: _expenseTitle.length,
             itemBuilder: (context, index) {
               return ExpenseBubble(
-                message: _messages[_messages.length - 1 - index],
-                isSentByMe: true, // don't alternate sender
+                title: _expenseTitle[_expenseTitle.length - 1 - index],
+                amount: 100.50,
+                paidBy: "User1",
+                split: "Equally (4 people)",
+                date: "17 Jan 2025",
+                time: "10:20 p.m.",
               );
             },
           ),
@@ -72,7 +76,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                           builder: (BuildContext context) {
                             return AlertDialog(
                               backgroundColor: AppColors.background,
-                              title: Text('Record an expense', style: TextStyle(color: AppColors.main)),
+                              title: Text('Record an expense',
+                                  style: TextStyle(color: AppColors.main)),
                               content: Column(children: [
                                 TextFormField(
                                   controller: _expenseTitleController,
@@ -103,7 +108,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                     return null;
                                   },
                                 ),
-                                                                TextFormField(
+                                TextFormField(
                                   controller: _expAmountController,
                                   style: TextStyle(color: AppColors.main),
                                   decoration: InputDecoration(
@@ -133,8 +138,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                   textInputAction: TextInputAction.next,
                                   maxLength: 50,
                                 ),
-
-                              
                               ]),
                               actions: <Widget>[
                                 TextButton(
@@ -156,52 +159,93 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 }
 
 class ExpenseBubble extends StatelessWidget {
-  final String message;
-  final bool isSentByMe;
+  final String title;
+  final double amount;
+  final String paidBy;
+  final String split;
+  final String date;
+  final String time;
 
   const ExpenseBubble({
-    required this.message,
-    required this.isSentByMe,
-  });
+    Key? key,
+    required this.title,
+    required this.amount,
+    required this.paidBy,
+    required this.split,
+    required this.date,
+    required this.time,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
     return Align(
-      alignment: Alignment.center,
-      child: Container(
-        margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-        padding: EdgeInsets.symmetric(
-            vertical: height * 0.06, horizontal: width * 0.4),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [AppColors.text, Colors.lightBlue],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(12),
-            topRight: Radius.circular(12),
-            bottomLeft: Radius.circular(12),
-            bottomRight: Radius.circular(12),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              offset: Offset(4, 4), // Shadow direction
-              blurRadius: 10, // Softness of the shadow
-              spreadRadius: 1, // How far the shadow spreads
+        alignment: Alignment.center,
+        child: Container(
+          margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+          padding: EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [const Color.fromARGB(255, 215, 55, 82), const Color.fromARGB(255, 139, 37, 37)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-          ],
-        ),
-        child: Text(
-          message,
-          style: TextStyle(
-            color: isSentByMe ? Colors.white : Colors.black87,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(12),
+              topRight: Radius.circular(12),
+              bottomLeft: Radius.circular(12),
+              bottomRight: Radius.circular(12),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                offset: Offset(4, 4), // Shadow direction
+                blurRadius: 10, // Softness of the shadow
+                spreadRadius: 1, // How far the shadow spreads
+              ),
+            ],
           ),
-        ),
-      ),
-    );
+          child: Column(
+            
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(height: 8.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Amount: \$${amount.toStringAsFixed(2)}",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white),
+                  ),
+                  Text(
+                    "Paid By: $paidBy",
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: Colors.white),
+                  ),
+                ],
+              ),
+              SizedBox(height: 4.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Split: $split",
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: Colors.white),
+                  ),
+                  Text(
+                    "$date at $time",
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: Colors.white),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ));
   }
 }
