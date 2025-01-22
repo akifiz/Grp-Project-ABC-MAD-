@@ -20,14 +20,14 @@
 ## Database Structure (for now)
 
 Events (collection)  <br>
-  ├── event id (document)<br>
-         ├──> title<br>
-         ├──> users id<br>
-         ├──> final balance<br>
-  ├── event id (document)<br>
-         ├──> title<br>
-         ├──> users id<br>
-         ├──> final balance<br>
+  -├── event id (document)<br>
+  ---├──> title<br>
+  ---├──> users id<br>
+  ---├──> final balance<br>
+  -├── event id (document)<br>
+  ---├──> title<br>
+  ---├──> users id<br>
+  ---├──> final balance<br>
   ..<br>
 <br>
 Expenses (collection)<br>
