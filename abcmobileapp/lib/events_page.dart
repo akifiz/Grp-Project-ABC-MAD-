@@ -123,8 +123,8 @@ class _EventsPageState extends State<EventsPage> {
                       if (number < 2) {
                         return 'Minimum 2 people required';
                       }
-                      if (number > 1000) {
-                        return 'Maximum 1000 people allowed';
+                      if (number > 100) {
+                        return 'Maximum 100 people allowed';
                       }
                       return null;
                     },
@@ -231,6 +231,23 @@ class _EventsPageState extends State<EventsPage> {
     );
   }
 
+  void _deleteEvent(Event event) {
+    setState(() {
+      widget.events.removeWhere((e) => e.id == event.id);
+    });
+    // Save the updated events list
+    widget.onEventUpdated(event);
+    
+    // Show confirmation
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Event deleted'),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -279,77 +296,23 @@ class _EventsPageState extends State<EventsPage> {
                   itemCount: widget.events.length,
                   itemBuilder: (context, index) {
                     final event = widget.events[index];
-                    return Dismissible(
-                      key: Key(event.id),
-                      background: Container(
-                        color: Colors.red,
-                        alignment: Alignment.centerRight,
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        child: Icon(Icons.delete, color: Colors.white),
-                      ),
-                      direction: DismissDirection.endToStart,
-                      confirmDismiss: (direction) async {
-                        return await showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              backgroundColor: AppColors.background,
-                              title: Text(
-                                'Delete Event',
-                                style: TextStyle(color: AppColors.text),
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: TileButton(
+                        text: "${event.name}\n${event.date.toString().split(' ')[0]}\n${event.numberOfPeople} People",
+                        icon: Icons.event,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EventDetailsPage(
+                                event: event,
+                                onEventUpdated: widget.onEventUpdated,
                               ),
-                              content: Text(
-                                'Are you sure you want to delete this event?',
-                                style: TextStyle(color: AppColors.main),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.of(context).pop(false),
-                                  child: Text(
-                                    'Cancel',
-                                    style: TextStyle(color: AppColors.text),
-                                  ),
-                                ),
-                                TextButton(
-                                  onPressed: () => Navigator.of(context).pop(true),
-                                  child: Text(
-                                    'Delete',
-                                    style: TextStyle(color: Colors.red),
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                      onDismissed: (direction) {
-                        // You'll need to add onEventDeleted callback
-                        // widget.onEventDeleted(event);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Event deleted'),
-                            backgroundColor: Colors.red,
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 8.0),
-                        child: TileButton(
-                          text: "${event.name}\n${event.date.toString().split(' ')[0]}\n${event.numberOfPeople} People",
-                          icon: Icons.event,
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => EventDetailsPage(
-                                  event: event,
-                                  onEventUpdated: widget.onEventUpdated,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
+                            ),
+                          );
+                        },
+                        onDelete: () => _deleteEvent(event),
                       ),
                     );
                   },
