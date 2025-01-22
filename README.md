@@ -19,30 +19,46 @@
 
 ## Database Structure (for now)
 
-### table LIST_OF_EVENTS  
-- int:PK eventId  
-- string:event title  
-- int:FK userId [...]  
-- bool: hasEventName [...] (optional)  
-- map:finalBalance [int:idIndexFrom,int:idIndexTo,float:amount...] (length will be C(n,2) at max)  
-- int:FK pending expenses [int:expenseId...]
+Events (collection)
+  ├── event id (document)
+         ├──> title
+         ├──> users id
+         ├──> final balance
+  ├── event id (document)
+         ├──> title
+         ├──> users id
+         ├──> final balance
+  ..
 
-### table EXPENSES  
-- int:PK expenseId
-- int:FK eventId
-- int:FK userId [...]
-- int:who paid (index of userId)
-- float:total
-- map:split [int:id, float:amount...]
-- string:expense title
-- :dateTime
-- bool:isSettled
-- string:subDescription
+Expenses (collection)
+  ├── event id (document)
+       ├── expenses (subcollection)
+            ├── expense1 (document)
+                  ├──> title
+                  ├──> amount
+                  ├──> paid by
+                  ├──> split
+                  ├──> dateTime
+                  ├──> isSettled            
+            ├── expense2 (document)
+                  .
+            ..
+  ├── event id (document)
+       ├── expenses (subcollection)
+            ├── expense1 (document)
+            ├── expense2 (document)
+            ..
+        ....
 
-### table USERS
-- int:PK userId
-- string:default name
-- map:event name [eventId, name] (not important)
-- image:profilePic
-- string: email
-- 
+Users (collections)
+  ├── user id (document)
+       ├──> email
+       ├──> default name
+       ├──> event ids
+       ├──> event names
+  ├── user id (document)
+       ├──> email
+       ├──> default name
+       ├──> event ids
+       ├──> event names
+   ..
