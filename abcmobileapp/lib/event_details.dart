@@ -19,6 +19,7 @@ class EventDetailsPage extends StatefulWidget {
 class _EventDetailsPageState extends State<EventDetailsPage> {
   final _messageController = TextEditingController();
   final _expenseTitleController = TextEditingController();
+  final _expAmountController = TextEditingController();
   final List<String> _messages = []; // List to store chat messages
 
   void _sendMessage() {
@@ -70,13 +71,43 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                           context: context,
                           builder: (BuildContext context) {
                             return AlertDialog(
-                              title: Text('Record an expense'),
+                              backgroundColor: AppColors.background,
+                              title: Text('Record an expense', style: TextStyle(color: AppColors.main)),
                               content: Column(children: [
                                 TextFormField(
                                   controller: _expenseTitleController,
-                                  style: TextStyle(color: Colors.black),
+                                  style: TextStyle(color: AppColors.main),
                                   decoration: InputDecoration(
                                     labelText: 'Title',
+                                    labelStyle:
+                                        TextStyle(color: AppColors.text),
+                                    enabledBorder: UnderlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: AppColors.text),
+                                    ),
+                                    focusedBorder: UnderlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: AppColors.text),
+                                    ),
+                                    errorStyle:
+                                        TextStyle(color: Colors.redAccent),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Enter expense amount';
+                                    }
+                                    if (int.tryParse(value) == null) {
+                                      return 'Please enter a valid number';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                                                TextFormField(
+                                  controller: _expAmountController,
+                                  style: TextStyle(color: AppColors.main),
+                                  decoration: InputDecoration(
+                                    labelText: 'Amount',
                                     labelStyle:
                                         TextStyle(color: AppColors.text),
                                     enabledBorder: UnderlineInputBorder(
@@ -101,7 +132,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                   },
                                   textInputAction: TextInputAction.next,
                                   maxLength: 50,
-                                )
+                                ),
+
+                              
                               ]),
                               actions: <Widget>[
                                 TextButton(
@@ -109,7 +142,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                     Navigator.of(context).pop();
                                     _sendMessage();
                                   },
-                                  child: Text('Close'),
+                                  child: Text('Submit'),
                                 ),
                               ],
                             );
