@@ -19,46 +19,47 @@
 
 ## Database Structure (for now)
 
-Events (collection)
-  ├── event id (document)
-         ├──> title
-         ├──> users id
-         ├──> final balance
-  ├── event id (document)
-         ├──> title
-         ├──> users id
-         ├──> final balance
-  ..
-
-Expenses (collection)
-  ├── event id (document)
-       ├── expenses (subcollection)
-            ├── expense1 (document)
-                  ├──> title
-                  ├──> amount
-                  ├──> paid by
-                  ├──> split
-                  ├──> dateTime
-                  ├──> isSettled            
-            ├── expense2 (document)
-                  .
-            ..
-  ├── event id (document)
-       ├── expenses (subcollection)
-            ├── expense1 (document)
-            ├── expense2 (document)
-            ..
-        ....
-
-Users (collections)
-  ├── user id (document)
-       ├──> email
-       ├──> default name
-       ├──> event ids
-       ├──> event names
-  ├── user id (document)
-       ├──> email
-       ├──> default name
-       ├──> event ids
-       ├──> event names
-   ..
+Events (collection)  <br>
+  ├── event id (document)<br>
+         ├──> title<br>
+         ├──> users id<br>
+         ├──> final balance<br>
+  ├── event id (document)<br>
+         ├──> title<br>
+         ├──> users id<br>
+         ├──> final balance<br>
+  ..<br>
+<br>
+Expenses (collection)<br>
+  ├── event id (document)<br>
+       ├── expenses (subcollection)<br>
+            ├── expense1 (document)<br>
+                  ├──> title<br>
+                  ├──> amount<br>
+                  ├──> paid by<br>
+                  ├──> split<br>
+                  ├──> dateTime<br>
+                  ├──> isSettled<br>         
+            ├── expense2 (document)<br>
+                  .<br>
+            ..<br>
+  ├── event id (document)<br>
+       ├── expenses (subcollection)<br>
+            ├── expense1 (document)<br>
+            ├── expense2 (document)<br>
+            ..<br>
+        ....<br>
+<br>
+Users (collections)<br>
+  ├── user id (document)<br>
+       ├──> email<br>
+       ├──> default name<br>
+       ├──> event ids<br>
+       ├──> event names<br>
+  ├── user id (document)<br>
+       ├──> email<br>
+       ├──> default name<br>
+       ├──> event ids<br>
+       ├──> event names<br>
+   ..<br>
+<br>
