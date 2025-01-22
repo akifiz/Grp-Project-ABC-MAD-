@@ -6,7 +6,7 @@ import 'app_colors.dart';
 import 'model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-
+import 'settings.dart';
 void main() {
   runApp(MyApp());
 }
@@ -107,12 +107,7 @@ class _MainAppState extends State<MainApp> {
           BaseLayout(
             currentIndex: _currentIndex,
             onTabTapped: _onTabTapped,
-            child: Center(
-              child: Text(
-                "Settings Page",
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-            ),
+            child: SettingsPage(),
           ),
           BaseLayout(
             currentIndex: _currentIndex,
