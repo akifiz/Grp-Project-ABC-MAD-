@@ -64,7 +64,7 @@ class _MainAppState extends State<MainApp> {
       if (eventsJson != null) {
         final List<dynamic> decodedEvents = jsonDecode(eventsJson);
         setState(() {
-          events = decodedEvents.map((eventMap) => Event.fromJson(eventMap)).toList();
+          //events = decodedEvents.map((eventMap) => Event.fromJson(eventMap)).toList();
         });
       }
     } catch (e) {
@@ -75,7 +75,7 @@ class _MainAppState extends State<MainApp> {
   Future<void> _saveEvents() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final String eventsJson = jsonEncode(events.map((event) => event.toJson()).toList());
+      final String eventsJson = '';//jsonEncode(events.map((event) => event.toJson()).toList());
       await prefs.setString('events', eventsJson);
     } catch (e) {
       print('Error saving events: $e');

@@ -203,9 +203,14 @@ class _EventsPageState extends State<EventsPage> {
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
                   final newEvent = Event(
-                    name: _nameController.text.trim(),
-                    date: selectedDate,
-                    numberOfPeople: int.parse(_peopleController.text),
+                    id:"E1",
+                    name: "Example Event",
+                    dateTime: "23 January 2025, 5.50 PM",
+                    userId: ["U1"],
+                    expenseId: ["EXP0"],
+                    // name: _nameController.text.trim(),
+                    // date: selectedDate,
+                    // numberOfPeople: int.parse(_peopleController.text),
                   );
                   widget.onEventAdded(newEvent);
                   Navigator.pop(context);
@@ -299,7 +304,7 @@ class _EventsPageState extends State<EventsPage> {
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 8.0),
                       child: TileButton(
-                        text: "${event.name}\n${event.date.toString().split(' ')[0]}\n${event.numberOfPeople} People",
+                        text: _nameController.text.trim(),//"${event.name}\n${event.date.toString().split(' ')[0]}\n${event.numberOfPeople} People",
                         icon: Icons.event,
                         onPressed: () {
                           Navigator.push(
