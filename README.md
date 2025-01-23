@@ -18,31 +18,4 @@
 > ..> flutter run
 
 ## Database Structure (for now)
-
-### table LIST_OF_EVENTS  
-- int:PK eventId  
-- string:event title  
-- int:FK userId [...]  
-- bool: hasEventName [...] (optional)  
-- map:finalBalance [int:idIndexFrom,int:idIndexTo,float:amount...] (length will be C(n,2) at max)  
-- int:FK pending expenses [int:expenseId...]
-
-### table EXPENSES  
-- int:PK expenseId
-- int:FK eventId
-- int:FK userId [...]
-- int:who paid (index of userId)
-- float:total
-- map:split [int:id, float:amount...]
-- string:expense title
-- :dateTime
-- bool:isSettled
-- string:subDescription
-
-### table USERS
-- int:PK userId
-- string:default name
-- map:event name [eventId, name] (not important)
-- image:profilePic
-- string: email
-- 
+![image](https://github.com/user-attachments/assets/be56555d-a62d-4fa7-8dff-fee35fcd9475)
