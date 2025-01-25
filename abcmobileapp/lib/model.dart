@@ -4,14 +4,12 @@ class Event {
   final String name;
   final String dateTime;
   final List<String> userId;
-  final List<String> expenseId;
 
   Event({
     required this.id,
     required this.name,
     required this.dateTime,
     required this.userId,
-    required this.expenseId,
   });
 
   factory Event.fromFirestore(Map<String, dynamic> data) {
@@ -20,7 +18,6 @@ class Event {
       name: data['name'],
       dateTime: data['dateTime'],
       userId: List<String>.from(data['userId']),
-      expenseId: List<String>.from(data['expenseId']),
     );
   }
 }
@@ -32,19 +29,21 @@ class Expense {
   final double amount;
   final String paidBy;
   final String split;
-  final String dateTime;
+  final String date;
+  final String time;
 
-  Expense({required this.id, required this.title, required this.amount, required this.paidBy, required this.split, required this.dateTime});
+  Expense({required this.id, required this.title, required this.amount, required this.paidBy, required this.split, required this.date, required this.time});
 
   // Factory method to create a expense object from a Firestore document
   factory Expense.fromFirestore(Map<String, dynamic> data) {
     return Expense(
       id: data['id'] ?? '',
-      title: data['name'] ?? '',
+      title: data['title'] ?? '',
       amount: data['amount'] ?? 0,
       paidBy: data['paidBy'] ?? '',
       split: data['split'] ?? '',
-      dateTime: data['dateTime'] ?? '',
+      date: data['date'] ?? '',
+      time: data['time'] ?? '',
     );
   }
 }

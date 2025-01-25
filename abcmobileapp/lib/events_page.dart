@@ -207,7 +207,6 @@ class _EventsPageState extends State<EventsPage> {
                     name: "Example Event",
                     dateTime: "23 January 2025, 5.50 PM",
                     userId: ["U1"],
-                    expenseId: ["EXP0"],
                     // name: _nameController.text.trim(),
                     // date: selectedDate,
                     // numberOfPeople: int.parse(_peopleController.text),
