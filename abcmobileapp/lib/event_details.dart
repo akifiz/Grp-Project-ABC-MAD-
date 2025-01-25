@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'model.dart';
@@ -21,6 +22,22 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   final _expenseTitleController = TextEditingController();
   final _expAmountController = TextEditingController();
   final List<String> _expenseTitle = []; // List to store chat messages
+  List<Expense> _expenses = [];
+
+  @override
+  void initState (){
+    super.initState();
+    _loadExpenses();
+  }
+  
+  Future<void> _loadExpenses() async{
+    final handler = FirebaseHandler();
+    List<Expense> eventExpenses = await handler.fetchExpenses("E1");
+    setState(() {
+      _expenses = eventExpenses;
+    });
+  }
+
 
   void _sendMessage() {
     setState(() {
@@ -43,15 +60,15 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         Expanded(
           child: ListView.builder(
             reverse: true, // Messages start from the bottom
-            itemCount: _expenseTitle.length,
+            itemCount: _expenses.length,
             itemBuilder: (context, index) {
               return ExpenseBubble(
-                title: _expenseTitle[_expenseTitle.length - 1 - index],
-                amount: 100.50,
-                paidBy: "User1",
-                split: "Equally (4 people)",
-                date: "17 Jan 2025",
-                time: "10:20 p.m.",
+                title: _expenses[_expenses.length - 1 - index].title,
+                amount: _expenses[_expenses.length - 1 - index].amount,
+                paidBy: _expenses[_expenses.length - 1 - index].paidBy,
+                split: _expenses[_expenses.length - 1 - index].split,
+                date: _expenses[_expenses.length - 1 - index].date,
+                time: _expenses[_expenses.length - 1 - index].time,
               );
             },
           ),
