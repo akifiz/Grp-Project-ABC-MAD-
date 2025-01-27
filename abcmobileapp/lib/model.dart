@@ -1,22 +1,28 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 class Event {
-  final String id;
-  final String name;
-  final String dateTime;
+  final String eventId;
+  final String title;
+  final String date;
+  final String time;
+  final String finalBalance;
   final List<String> userId;
 
   Event({
-    required this.id,
-    required this.name,
-    required this.dateTime,
+    required this.eventId,
+    required this.title,
+    required this.date,
+    required this.time,
+    required this.finalBalance,
     required this.userId,
   });
 
   factory Event.fromFirestore(Map<String, dynamic> data) {
     return Event(
-      id: data['id'],
-      name: data['name'],
-      dateTime: data['dateTime'],
+      eventId: data['eventId'],
+      title: data['title'],
+      date: data['date'],
+      time: data['time'],
+      finalBalance: data['finalBalance'],
       userId: List<String>.from(data['userId']),
     );
   }
@@ -71,6 +77,22 @@ class FirebaseHandler {
   }
 
 
+  // Fetch all events from the "EVENTS" collection based on user id events
+  Future<List<Event>> fetchEvents(String userId) async {
+    try {
+      //TODO: fetch events of specific user not all events
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('EVENTS')
+          .get();
+      List<Event> events = querySnapshot.docs.map((doc) {
+        return Event.fromFirestore(doc.data() as Map<String, dynamic>);
+      }).toList();
+      return events;
+    } catch (e) {
+      print('Error fetching events: $e');
+      return [];
+    }
+  }
 
 
 
