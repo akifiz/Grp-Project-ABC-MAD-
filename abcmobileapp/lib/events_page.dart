@@ -7,21 +7,27 @@ import 'model.dart';
 import 'tilebutton.dart';
 
 class EventsPage extends StatefulWidget {
+  final List<Event> events;
+
+  const EventsPage({
+    Key? key,
+    required this.events,
+  }) : super(key: key);
 
   @override
   _EventsPageState createState() => _EventsPageState();
 }
 
 class _EventsPageState extends State<EventsPage> {
+  
   final _formKey = GlobalKey<FormState>();
   final _peopleController = TextEditingController();
   final _nameController = TextEditingController();
-  List<Event> events = [];
+  
 
   @override
   void initState() {
     super.initState();
-    _peopleController.text = '2'; // Default value
   }
 
   @override
@@ -194,16 +200,6 @@ class _EventsPageState extends State<EventsPage> {
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
                   //TODO: handle adding events to firebase
-                  final newEvent = Event(
-                    id:"E1",
-                    name: "Example Event",
-                    dateTime: "23 January 2025, 5.50 PM",
-                    userId: ["U1"],
-                    // name: _nameController.text.trim(),
-                    // date: selectedDate,
-                    // numberOfPeople: int.parse(_peopleController.text),
-                  );
-                  //widget.onEventAdded(newEvent);
                   Navigator.pop(context);
                   
                   // Show confirmation
@@ -265,7 +261,7 @@ class _EventsPageState extends State<EventsPage> {
         Expanded(
           child: Stack(
             children: [
-              if (events.isEmpty)
+              if (widget.events.isEmpty)
                 Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -290,9 +286,9 @@ class _EventsPageState extends State<EventsPage> {
               else
                 ListView.builder(
                   padding: EdgeInsets.all(16),
-                  itemCount: events.length,
+                  itemCount: widget.events.length,
                   itemBuilder: (context, index) {
-                    final event = events[index];
+                    final event = widget.events[index];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 8.0),
                       child: TileButton(
