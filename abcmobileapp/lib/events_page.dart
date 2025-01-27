@@ -292,7 +292,7 @@ class _EventsPageState extends State<EventsPage> {
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 8.0),
                       child: TileButton(
-                        text: _nameController.text.trim(),//"${event.name}\n${event.date.toString().split(' ')[0]}\n${event.numberOfPeople} People",
+                        text: "${event.title}\n${event.date}\n${event.userId.length} People",
                         icon: Icons.event,
                         onPressed: () {
                           Navigator.push(
