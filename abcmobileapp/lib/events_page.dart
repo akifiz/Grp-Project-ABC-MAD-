@@ -7,16 +7,6 @@ import 'model.dart';
 import 'tilebutton.dart';
 
 class EventsPage extends StatefulWidget {
-  final List<Event> events;
-  final Function(Event) onEventAdded;
-  final Function(Event) onEventUpdated;
-
-  const EventsPage({
-    Key? key,
-    required this.events,
-    required this.onEventAdded,
-    required this.onEventUpdated,
-  }) : super(key: key);
 
   @override
   _EventsPageState createState() => _EventsPageState();
@@ -26,6 +16,7 @@ class _EventsPageState extends State<EventsPage> {
   final _formKey = GlobalKey<FormState>();
   final _peopleController = TextEditingController();
   final _nameController = TextEditingController();
+  List<Event> events = [];
 
   @override
   void initState() {
@@ -202,6 +193,7 @@ class _EventsPageState extends State<EventsPage> {
             TextButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
+                  //TODO: handle adding events to firebase
                   final newEvent = Event(
                     id:"E1",
                     name: "Example Event",
@@ -211,7 +203,7 @@ class _EventsPageState extends State<EventsPage> {
                     // date: selectedDate,
                     // numberOfPeople: int.parse(_peopleController.text),
                   );
-                  widget.onEventAdded(newEvent);
+                  //widget.onEventAdded(newEvent);
                   Navigator.pop(context);
                   
                   // Show confirmation
@@ -236,11 +228,12 @@ class _EventsPageState extends State<EventsPage> {
   }
 
   void _deleteEvent(Event event) {
-    setState(() {
-      widget.events.removeWhere((e) => e.id == event.id);
-    });
-    // Save the updated events list
-    widget.onEventUpdated(event);
+    //TODO: handle delete events in firebase
+    // setState(() {
+    //   widget.events.removeWhere((e) => e.id == event.id);
+    // });
+    // // Save the updated events list
+    // widget.onEventUpdated(event);
     
     // Show confirmation
     ScaffoldMessenger.of(context).showSnackBar(
@@ -272,7 +265,7 @@ class _EventsPageState extends State<EventsPage> {
         Expanded(
           child: Stack(
             children: [
-              if (widget.events.isEmpty)
+              if (events.isEmpty)
                 Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -297,9 +290,9 @@ class _EventsPageState extends State<EventsPage> {
               else
                 ListView.builder(
                   padding: EdgeInsets.all(16),
-                  itemCount: widget.events.length,
+                  itemCount: events.length,
                   itemBuilder: (context, index) {
-                    final event = widget.events[index];
+                    final event = events[index];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 8.0),
                       child: TileButton(
@@ -311,7 +304,6 @@ class _EventsPageState extends State<EventsPage> {
                             MaterialPageRoute(
                               builder: (context) => EventDetailsPage(
                                 event: event,
-                                onEventUpdated: widget.onEventUpdated,
                               ),
                             ),
                           );

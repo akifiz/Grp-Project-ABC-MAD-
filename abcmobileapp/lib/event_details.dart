@@ -4,12 +4,10 @@ import 'model.dart';
 
 class EventDetailsPage extends StatefulWidget {
   final Event event;
-  final Function(Event) onEventUpdated;
 
   const EventDetailsPage({
     Key? key,
     required this.event,
-    required this.onEventUpdated,
   }) : super(key: key);
 
   @override
@@ -30,6 +28,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   Future<void> _loadExpenses() async{
     try {
       final handler = FirebaseHandler();
+      //TODO: change "E1" to event.eventId once the event object passing is implemented
       List<Expense> eventExpenses = await handler.fetchExpenses("E1");
       setState(() {
         _expenses = eventExpenses;

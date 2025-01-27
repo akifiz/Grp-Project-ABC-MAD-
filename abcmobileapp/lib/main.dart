@@ -124,9 +124,7 @@ class _MainAppState extends State<MainApp> {
             currentIndex: _currentIndex,
             onTabTapped: _onTabTapped,
             child: EventsPage(
-              events: events,
-              onEventAdded: _addEvent,
-              onEventUpdated: _updateEvent,
+              //pass parameter (may not be neccessary)
             ),
           ),
         ],
