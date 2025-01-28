@@ -4,12 +4,10 @@ import 'model.dart';
 
 class EventDetailsPage extends StatefulWidget {
   final Event event;
-  final Function(Event) onEventUpdated;
 
   const EventDetailsPage({
     Key? key,
     required this.event,
-    required this.onEventUpdated,
   }) : super(key: key);
 
   @override
@@ -17,17 +15,32 @@ class EventDetailsPage extends StatefulWidget {
 }
 
 class _EventDetailsPageState extends State<EventDetailsPage> {
-  final _messageController = TextEditingController();
   final _expenseTitleController = TextEditingController();
-  final _expAmountController = TextEditingController();
-  final List<String> _expenseTitle = []; // List to store chat messages
+  final _expenseAmountController = TextEditingController();
+  List<Expense> _expenses = [];
+
+  @override
+  void initState (){
+    super.initState();
+    _loadExpenses();
+  }
+  
+  Future<void> _loadExpenses() async{
+    try {
+      final handler = FirebaseHandler();
+      //TODO: change "E1" to widget.event.eventId once the event object passing is implemented
+      List<Expense> eventExpenses = await handler.fetchExpenses("E1");
+      setState(() {
+        _expenses = eventExpenses;
+      });
+    } catch (e) {
+      print('Error loading events: $e');
+    }
+  }
+
 
   void _sendMessage() {
-    setState(() {
-      _expenseTitle.add(_expenseTitleController.text);
-    });
-    _messageController.clear(); // Clear the input field
-    _expenseTitleController.clear();
+    //do something
   }
 
   @override
@@ -35,7 +48,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text(widget.event.name),
+        title: Text(widget.event.title),
         backgroundColor: AppColors.text,
         foregroundColor: Colors.white,
       ),
@@ -43,15 +56,15 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         Expanded(
           child: ListView.builder(
             reverse: true, // Messages start from the bottom
-            itemCount: _expenseTitle.length,
+            itemCount: _expenses.length,
             itemBuilder: (context, index) {
               return ExpenseBubble(
-                title: _expenseTitle[_expenseTitle.length - 1 - index],
-                amount: 100.50,
-                paidBy: "User1",
-                split: "Equally (4 people)",
-                date: "17 Jan 2025",
-                time: "10:20 p.m.",
+                title: _expenses[_expenses.length - 1 - index].title,
+                amount: _expenses[_expenses.length - 1 - index].amount,
+                paidBy: _expenses[_expenses.length - 1 - index].paidBy,
+                split: _expenses[_expenses.length - 1 - index].split,
+                date: _expenses[_expenses.length - 1 - index].date,
+                time: _expenses[_expenses.length - 1 - index].time,
               );
             },
           ),
@@ -109,7 +122,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                   },
                                 ),
                                 TextFormField(
-                                  controller: _expAmountController,
+                                  controller: _expenseAmountController,
                                   style: TextStyle(color: AppColors.main),
                                   decoration: InputDecoration(
                                     labelText: 'Amount',

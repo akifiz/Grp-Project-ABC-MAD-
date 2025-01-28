@@ -8,14 +8,10 @@ import 'tilebutton.dart';
 
 class EventsPage extends StatefulWidget {
   final List<Event> events;
-  final Function(Event) onEventAdded;
-  final Function(Event) onEventUpdated;
 
   const EventsPage({
     Key? key,
     required this.events,
-    required this.onEventAdded,
-    required this.onEventUpdated,
   }) : super(key: key);
 
   @override
@@ -23,14 +19,15 @@ class EventsPage extends StatefulWidget {
 }
 
 class _EventsPageState extends State<EventsPage> {
+  
   final _formKey = GlobalKey<FormState>();
   final _peopleController = TextEditingController();
   final _nameController = TextEditingController();
+  
 
   @override
   void initState() {
     super.initState();
-    _peopleController.text = '2'; // Default value
   }
 
   @override
@@ -202,12 +199,7 @@ class _EventsPageState extends State<EventsPage> {
             TextButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
-                  final newEvent = Event(
-                    name: _nameController.text.trim(),
-                    date: selectedDate,
-                    numberOfPeople: int.parse(_peopleController.text),
-                  );
-                  widget.onEventAdded(newEvent);
+                  //TODO: handle adding events to firebase
                   Navigator.pop(context);
                   
                   // Show confirmation
@@ -232,11 +224,12 @@ class _EventsPageState extends State<EventsPage> {
   }
 
   void _deleteEvent(Event event) {
-    setState(() {
-      widget.events.removeWhere((e) => e.id == event.id);
-    });
-    // Save the updated events list
-    widget.onEventUpdated(event);
+    //TODO: handle delete events in firebase
+    // setState(() {
+    //   widget.events.removeWhere((e) => e.id == event.id);
+    // });
+    // // Save the updated events list
+    // widget.onEventUpdated(event);
     
     // Show confirmation
     ScaffoldMessenger.of(context).showSnackBar(
@@ -299,7 +292,7 @@ class _EventsPageState extends State<EventsPage> {
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 8.0),
                       child: TileButton(
-                        text: "${event.name}\n${event.date.toString().split(' ')[0]}\n${event.numberOfPeople} People",
+                        text: "${event.title}\n${event.date}\n${event.userId.length} People",
                         icon: Icons.event,
                         onPressed: () {
                           Navigator.push(
@@ -307,7 +300,6 @@ class _EventsPageState extends State<EventsPage> {
                             MaterialPageRoute(
                               builder: (context) => EventDetailsPage(
                                 event: event,
-                                onEventUpdated: widget.onEventUpdated,
                               ),
                             ),
                           );

@@ -10,60 +10,60 @@ class DashboardPage extends StatelessWidget {
     required this.events,
   }) : super(key: key);
 
-  List<Map<String, dynamic>> _processExpenses() {
-    final List<Map<String, dynamic>> expenses = [];
-    double totalAmount = 0;
+  // List<Map<String, dynamic>> _processExpenses() {
+  //   final List<Map<String, dynamic>> expenses = [];
+  //   double totalAmount = 0;
 
-    for (var event in events) {
-      for (var expense in event.expenses) {
-        // Calculate individual shares
-        double share = expense.amount / expense.sharedWith.length;
+  //   for (var event in events) {
+  //     for (var expense in event.expenses) {
+  //       // Calculate individual shares
+  //       double share = expense.amount / expense.sharedWith.length;
         
-        // Add expense for the person who paid
-        expenses.add({
-          'type': 'paid',
-          'name': expense.paidBy,
-          'event': event.name,
-          'amount': expense.amount,
-          'date': expense.date,
-        });
-        totalAmount += expense.amount;
+  //       // Add expense for the person who paid
+  //       expenses.add({
+  //         'type': 'paid',
+  //         'name': expense.paidBy,
+  //         'event': event.name,
+  //         'amount': expense.amount,
+  //         'date': expense.date,
+  //       });
+  //       totalAmount += expense.amount;
 
-        // Add entries for people who owe money
-        for (var person in expense.sharedWith) {
-          if (person != expense.paidBy) {
-            expenses.add({
-              'type': 'owed',
-              'name': person,
-              'event': event.name,
-              'amount': share,
-              'date': expense.date,
-            });
-          }
-        }
-      }
-    }
+  //       // Add entries for people who owe money
+  //       for (var person in expense.sharedWith) {
+  //         if (person != expense.paidBy) {
+  //           expenses.add({
+  //             'type': 'owed',
+  //             'name': person,
+  //             'event': event.name,
+  //             'amount': share,
+  //             'date': expense.date,
+  //           });
+  //         }
+  //       }
+  //     }
+  //   }
 
-    // Sort expenses by date
-    expenses.sort((a, b) => b['date'].compareTo(a['date']));
-    return expenses;
-  }
+  //   // Sort expenses by date
+  //   expenses.sort((a, b) => b['date'].compareTo(a['date']));
+  //   return expenses;
+  // }
 
   Map<String, double> _calculateBalances() {
     final Map<String, double> balances = {};
 
-    for (var event in events) {
-      for (var expense in event.expenses) {
-        // Add to payer's balance
-        balances[expense.paidBy] = (balances[expense.paidBy] ?? 0) + expense.amount;
+    // for (var event in events) {
+    //   for (var expense in event.expenses) {
+    //     // Add to payer's balance
+    //     balances[expense.paidBy] = (balances[expense.paidBy] ?? 0) + expense.amount;
 
-        // Subtract shares from participants
-        double share = expense.amount / expense.sharedWith.length;
-        for (var person in expense.sharedWith) {
-          balances[person] = (balances[person] ?? 0) - share;
-        }
-      }
-    }
+    //     // Subtract shares from participants
+    //     double share = expense.amount / expense.sharedWith.length;
+    //     for (var person in expense.sharedWith) {
+    //       balances[person] = (balances[person] ?? 0) - share;
+    //     }
+    //   }
+    // }
 
     return balances;
   }
@@ -71,7 +71,7 @@ class DashboardPage extends StatelessWidget {
   // In dashboard_page.dart
 @override
 Widget build(BuildContext context) {
-  final expenses = _processExpenses();
+  //final expenses = _processExpenses();
   final balances = _calculateBalances();
 
   return Column(
@@ -195,8 +195,8 @@ Widget build(BuildContext context) {
       Expanded(
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 32.0),
-          child: expenses.isEmpty
-              ? Card(
+          child: //expenses.isEmpty
+                 Card(
                   color: AppColors.subAlt,
                   child: Center(
                     child: Column(
@@ -229,36 +229,36 @@ Widget build(BuildContext context) {
                     ),
                   ),
                 )
-              : ListView.builder(
-                  itemCount: expenses.length,
-                  itemBuilder: (context, index) {
-                    final expense = expenses[index];
-                    return Card(
-                      color: AppColors.subAlt,
-                      child: ListTile(
-                        title: Text(
-                          expense['event'],
-                          style: TextStyle(
-                            color: AppColors.main,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        subtitle: Text(
-                          '${expense['name']} ${expense['type'] == 'paid' ? 'paid' : 'owes'} RM${expense['amount'].toStringAsFixed(2)}',
-                          style: TextStyle(
-                            color: AppColors.main.withOpacity(0.7),
-                          ),
-                        ),
-                        trailing: Text(
-                          expense['date'].toString().split(' ')[0],
-                          style: TextStyle(
-                            color: AppColors.main,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
+              // : ListView.builder(
+              //     itemCount: expenses.length,
+              //     itemBuilder: (context, index) {
+              //       final expense = expenses[index];
+              //       return Card(
+              //         color: AppColors.subAlt,
+              //         child: ListTile(
+              //           title: Text(
+              //             expense['event'],
+              //             style: TextStyle(
+              //               color: AppColors.main,
+              //               fontWeight: FontWeight.bold,
+              //             ),
+              //           ),
+              //           subtitle: Text(
+              //             '${expense['name']} ${expense['type'] == 'paid' ? 'paid' : 'owes'} RM${expense['amount'].toStringAsFixed(2)}',
+              //             style: TextStyle(
+              //               color: AppColors.main.withOpacity(0.7),
+              //             ),
+              //           ),
+              //           trailing: Text(
+              //             expense['date'].toString().split(' ')[0],
+              //             style: TextStyle(
+              //               color: AppColors.main,
+              //             ),
+              //           ),
+              //         ),
+              //       );
+              //     },
+              //   ),
         ),
       ),
     ],

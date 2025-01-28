@@ -18,4 +18,3 @@
 > ..> flutter run
 
 ## Database Structure (for now)
-![image](https://github.com/user-attachments/assets/be56555d-a62d-4fa7-8dff-fee35fcd9475)

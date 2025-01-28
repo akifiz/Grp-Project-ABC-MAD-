@@ -44,7 +44,7 @@ class MainApp extends StatefulWidget {
 class _MainAppState extends State<MainApp> {
   int _currentIndex = 1;
   final PageController _pageController = PageController(initialPage: 1);
-  List<Event> events = [];
+  List<Event> _events = [];
   
   @override
   void initState() {
@@ -60,14 +60,11 @@ class _MainAppState extends State<MainApp> {
 
   Future<void> _loadEvents() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final String? eventsJson = prefs.getString('events');
-      if (eventsJson != null) {
-        final List<dynamic> decodedEvents = jsonDecode(eventsJson);
-        setState(() {
-          events = decodedEvents.map((eventMap) => Event.fromJson(eventMap)).toList();
-        });
-      }
+      final handler = FirebaseHandler();
+      List<Event> userEvents = await handler.fetchEvents("U1");
+      setState(() {
+        _events= userEvents;
+      });
     } catch (e) {
       print('Error loading events: $e');
     }
@@ -76,29 +73,29 @@ class _MainAppState extends State<MainApp> {
   Future<void> _saveEvents() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final String eventsJson = jsonEncode(events.map((event) => event.toJson()).toList());
+      final String eventsJson = '';//jsonEncode(events.map((event) => event.toJson()).toList());
       await prefs.setString('events', eventsJson);
     } catch (e) {
       print('Error saving events: $e');
     }
   }
 
-  void _addEvent(Event event) {
-    setState(() {
-      events.add(event);
-    });
-    _saveEvents();
-  }
+  // void _addEvent(Event event) {
+  //   setState(() {
+  //     _events.add(event);
+  //   });
+  //   _saveEvents();
+  // }
 
-  void _updateEvent(Event event) {
-    final index = events.indexWhere((e) => e.id == event.id);
-    if (index != -1) {
-      setState(() {
-        events[index] = event;
-      });
-      _saveEvents();
-    }
-  }
+  // void _updateEvent(Event event) {
+  //   // final index = events.indexWhere((e) => e.id == event.id);
+  //   // if (index != -1) {
+  //   //   setState(() {
+  //   //     events[index] = event;
+  //   //   });
+  //   //   _saveEvents();
+  //   // }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -119,16 +116,12 @@ class _MainAppState extends State<MainApp> {
           BaseLayout(
             currentIndex: _currentIndex,
             onTabTapped: _onTabTapped,
-            child: DashboardPage(events: events),
+            child: DashboardPage(events: _events),
           ),
           BaseLayout(
             currentIndex: _currentIndex,
             onTabTapped: _onTabTapped,
-            child: EventsPage(
-              events: events,
-              onEventAdded: _addEvent,
-              onEventUpdated: _updateEvent,
-            ),
+            child: EventsPage(events: _events),
           ),
         ],
       ),
