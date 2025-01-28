@@ -41,6 +41,8 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
+  //TODO: fetch userId based on account login
+  final String userId = "U1";
   int _currentIndex = 1;
   final PageController _pageController = PageController(initialPage: 1);
   List<Event> _events = [];
@@ -60,7 +62,8 @@ class _MainAppState extends State<MainApp> {
   Future<void> _loadEvents() async {
     try {
       final handler = FirebaseHandler();
-      List<Event> userEvents = await handler.fetchEvents("U1");
+      //TODO: change to currentUser.eventId
+      List<Event> userEvents = await handler.fetchEvents(["E1"]);
       setState(() {
         _events= userEvents;
       });
