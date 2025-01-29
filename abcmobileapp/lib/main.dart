@@ -42,14 +42,17 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
+  //TODO: fetch userId based on account login
+  final String _userId = "U1";
   int _currentIndex = 1;
   final PageController _pageController = PageController(initialPage: 1);
-  List<Event> _events = [];
+  late List<Event> _events = [];
+  late User _userData;
   
   @override
   void initState() {
     super.initState();
-    _loadEvents();
+    _loadUserData();
   }
   
   @override
@@ -58,15 +61,20 @@ class _MainAppState extends State<MainApp> {
     super.dispose();
   }
 
-  Future<void> _loadEvents() async {
+  Future<void> _loadUserData() async {
     try {
       final handler = FirebaseHandler();
-      List<Event> userEvents = await handler.fetchEvents("U1");
-      setState(() {
-        _events= userEvents;
+      User userData = await handler.fetchUserData(_userId);
+      setState((){
+        _userData= userData;
       });
-    } catch (e) {
-      print('Error loading events: $e');
+
+      List<Event> userEvents = await handler.fetchEvents(_userData.eventId);
+      setState(() {
+        _events = userEvents;
+      });
+    }catch(e){
+      print('Error loading user data $e');
     }
   }
 
@@ -111,17 +119,25 @@ class _MainAppState extends State<MainApp> {
           BaseLayout(
             currentIndex: _currentIndex,
             onTabTapped: _onTabTapped,
-            child: SettingsPage(),
+            child: SettingsPage(
+              userData: _userData,
+            ),
           ),
           BaseLayout(
             currentIndex: _currentIndex,
             onTabTapped: _onTabTapped,
-            child: DashboardPage(events: _events),
+            child: DashboardPage(
+              userData: _userData,
+              events: _events
+            ),
           ),
           BaseLayout(
             currentIndex: _currentIndex,
             onTabTapped: _onTabTapped,
-            child: EventsPage(events: _events),
+            child: EventsPage(
+              userData: _userData,
+              events: _events
+            ),
           ),
         ],
       ),

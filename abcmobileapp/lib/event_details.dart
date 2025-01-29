@@ -3,10 +3,12 @@ import 'app_colors.dart';
 import 'model.dart';
 
 class EventDetailsPage extends StatefulWidget {
+  final User userData;
   final Event event;
 
   const EventDetailsPage({
     Key? key,
+    required this.userData,
     required this.event,
   }) : super(key: key);
 
