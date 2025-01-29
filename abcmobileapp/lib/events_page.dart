@@ -202,14 +202,13 @@ class _EventsPageState extends State<EventsPage> {
             TextButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
-                  //TODO: handle adding events to firebase
                   _addEvent(
                     new Event(
-                      eventId: "E${widget.events.length}",
-                      title: "Another event",
+                      eventId: "E${widget.events.length + 1}",
+                      title: "Event E${widget.events.length + 1}",
                       userId: ['U1','U2'],
                       date: DateFormat('d MMMM yyyy').format(DateTime.now()),
-                      time: DateFormat('d MMMM yyyy').format(DateTime.now()), 
+                      time: DateFormat('hh.mm a').format(DateTime.now()), 
                     )
                   );
                   Navigator.pop(context);
@@ -322,7 +321,7 @@ class _EventsPageState extends State<EventsPage> {
                             MaterialPageRoute(
                               builder: (context) => EventDetailsPage(
                                 userData: widget.userData,
-                                event: event,
+                                event: widget.events[index],
                               ),
                             ),
                           );

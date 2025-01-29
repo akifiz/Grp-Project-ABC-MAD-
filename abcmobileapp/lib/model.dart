@@ -130,6 +130,7 @@ class FirebaseHandler {
   }
 
   Future<void> createEvent(Event event) async {
+  try{
     await _firestore.collection('EVENTS').doc(event.eventId).set({
       'eventId': event.eventId,
       'title': event.title,
@@ -148,7 +149,16 @@ class FirebaseHandler {
         '${event.userId[i]}': event.userId[i],
         'balance': List.filled(event.userId.length, 0.0),
       });
+      await _firestore
+          .collection('USERS')
+          .doc(event.userId[i])
+          .update({
+            'eventId': FieldValue.arrayUnion([event.eventId]),
+          });
     }
+  } catch (e){
+    print("Error creating an event");
+  }
   }
 
   // // Add a new expense to the "expenses" collection
