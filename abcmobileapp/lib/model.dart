@@ -27,7 +27,8 @@ class Event {
   final String title;
   final String date;
   final String time;
-  final List<String> userId;
+   List<String> userId;
+  List<String> balance;
 
   Event({
     required this.eventId,
@@ -35,6 +36,7 @@ class Event {
     required this.date,
     required this.time,
     required this.userId,
+    required this.balance,
   });
 
   factory Event.fromFirestore(Map<String, dynamic> data) {
@@ -44,6 +46,7 @@ class Event {
       date: data['date'],
       time: data['time'],
       userId: List<String>.from(data['userId']),
+      balance: List<String>.from(data['balance']),
     );
   }
 }
@@ -121,7 +124,7 @@ class FirebaseHandler {
   Future<User> fetchUserData(String userId) async {
     try {
       DocumentSnapshot doc =
-          await _firestore.collection('USERS').doc(userId).get();
+        await _firestore.collection('USERS').doc(userId).get();
       return User.fromFirestore(doc);
     } catch (e) {
       print('Error fetching user data: $e');
@@ -143,12 +146,10 @@ class FirebaseHandler {
       await _firestore
           .collection('EVENTS')
           .doc(event.eventId)
-          .collection('BALANCE') 
-          .doc(event.userId[i])
-          .set({
-        '${event.userId[i]}': event.userId[i],
-        'balance': List.filled(event.userId.length, 0.0),
+          .update({
+        'balance': List.filled(event.userId.length, createRepeatingPattern('0,', event.userId.length)),
       });
+
       await _firestore
           .collection('USERS')
           .doc(event.userId[i])
@@ -176,6 +177,21 @@ class FirebaseHandler {
   } catch (e){
     print("Error creating an expense");
   }   
+  }
+
+  Future<void> updateBalance(List<String> newBalance, String eventId) async{
+   try{
+    await _firestore.collection('EVENTS').doc(eventId).update({
+      'balance': newBalance,
+    });
+  } catch (e){
+    print("Error updating balance to firestore: $e");
+  }   
+
+  }
+
+  String createRepeatingPattern(String pattern, int times) {
+    return List.generate(times, (index) => pattern).join('');
   }
 
   // // Add a new expense to the "expenses" collection

@@ -4,7 +4,6 @@ import 'events_page.dart';
 import 'base_layout.dart';
 import 'app_colors.dart';
 import 'model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'settings.dart';
 import 'package:firebase_core/firebase_core.dart';

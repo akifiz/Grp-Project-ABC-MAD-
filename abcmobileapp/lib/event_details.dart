@@ -44,13 +44,32 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   void _addExpense(Expense expense) {
     try {
       final handler = FirebaseHandler();
+      handler.createExpense(expense, widget.event.eventId);
       setState(() {
-        handler.createExpense(expense, widget.event.eventId);
         _expenses.add(expense);
+        _updateBalance(expense);
       });
     } catch (e) {
       print('Error adding an expense: $e');
     }
+  }
+
+  Future<void> _updateBalance (Expense newExpense) async {
+    try {
+      List<String> newBalance = calculateBalance(widget.event.balance, newExpense);
+      setState(() {
+        widget.event.balance = newBalance;
+      });
+      final handler = FirebaseHandler();
+      handler.updateBalance(newBalance, widget.event.eventId);
+      //TODO: update balance in firebase
+    } catch (e) {
+      print('Error updating balance: $e');
+    }
+  }
+
+  List<String> calculateBalance(List<String> originalBalance, Expense newExpense){
+    return ["123,234,",'0,0,'];
   }
 
   @override
@@ -63,6 +82,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         foregroundColor: Colors.white,
       ),
       body: Column(children: [
+        //event balance
+        Divider(height: 1),
         Expanded(
           child: ListView.builder(
             reverse: true, // Messages start from the bottom
