@@ -21,11 +21,13 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   final _expenseTitleController = TextEditingController();
   final _expenseAmountController = TextEditingController();
   List<Expense> _expenses = [];
+  late int _userIndex;
 
   @override
   void initState (){
     super.initState();
     _loadExpenses();
+    _userIndex = widget.event.userId.indexOf(widget.userData.userId);
   }
   
   Future<void> _loadExpenses() async{
@@ -44,14 +46,51 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   void _addExpense(Expense expense) {
     try {
       final handler = FirebaseHandler();
+      handler.createExpense(expense, widget.event.eventId);
       setState(() {
-        handler.createExpense(expense, widget.event.eventId);
         _expenses.add(expense);
+        _updateBalance(expense);
       });
     } catch (e) {
       print('Error adding an expense: $e');
     }
   }
+
+  Future<void> _updateBalance (Expense newExpense) async {
+    try {
+      List<String> newBalance = calculateBalance(widget.event.balance, newExpense);
+      setState(() {
+        widget.event.balance = newBalance;
+        widget.event.totalSpending += newExpense.amount;
+      });
+      final handler = FirebaseHandler();
+      handler.updateBalance(newBalance, widget.event.eventId, widget.event.totalSpending);
+    } catch (e) {
+      print('Error updating balance: $e');
+    }
+  }
+
+  List<String> calculateBalance(List<String> originalBalance, Expense newExpense){
+    List<List<double>> balance = mapToDoubleListList(originalBalance);
+    List<double> costSplit = mapToDoubleList(newExpense.split);
+    int payerIndex = newExpense.paidBy;
+
+    for(var i = 0; i < balance.length; i++){
+      if (i == payerIndex) {
+        balance[i] = addDoubleLists(balance[i], costSplit);
+        continue;
+      }
+      for(var j = 0; j < balance[i].length; j++){
+        if(j == payerIndex){
+          balance[i][j] -= costSplit[i];
+          continue;
+        }
+      }
+    }
+    return doubleListListToStringList(balance);
+  }
+
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +102,11 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         foregroundColor: Colors.white,
       ),
       body: Column(children: [
+        Text(
+          "Total Spent: ${widget.event.totalSpending}\nYour spending: ${mapToDoubleList(widget.event.balance[_userIndex])[_userIndex]}\nBalance: ${widget.event.balance[_userIndex]}",
+          style: TextStyle(color: Colors.black, backgroundColor: const Color.fromARGB(255, 240, 215, 245)),
+        ),
+        Divider(height: 1),
         Expanded(
           child: ListView.builder(
             reverse: true, // Messages start from the bottom
@@ -171,8 +215,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                         id: "EXP${_expenses.length + 1}",
                                         title: "Expense EXP${_expenses.length + 1}",
                                         amount: 100,
-                                        paidBy: widget.userData.userId,
-                                        split: "SPLIT",
+                                        paidBy: 0,
+                                        split: "50,50",
                                         date: DateFormat('d MMMM yyyy').format(DateTime.now()),
                                         time: DateFormat('h:mm a').format(DateTime.now()), 
                                       )
@@ -194,7 +238,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 class ExpenseBubble extends StatelessWidget {
   final String title;
   final double amount;
-  final String paidBy;
+  final int paidBy;
   final String split;
   final String date;
   final String time;
@@ -281,4 +325,31 @@ class ExpenseBubble extends StatelessWidget {
           ),
         ));
   }
+}
+
+
+//helper methods
+List<double> mapToDoubleList(String str) {
+  return str
+      .split(',') // Split by comma
+      .where((s) => s.isNotEmpty) // Remove empty values
+      .map((s) => double.parse(s)) // Convert to double
+      .toList();
+}
+
+List<List<double>> mapToDoubleListList(List<String> stringList) {
+  return stringList.map((str) {
+    return mapToDoubleList(str);
+  }).toList();
+}
+
+List<String> doubleListListToStringList(List<List<double>> doubleList) {
+  return doubleList.map((innerList) {
+    return innerList.map((d) => d.toString()).join(',');
+  }).toList();
+}
+
+List<double> addDoubleLists(List<double> list1, List<double> list2) {
+  int minLength = list1.length < list2.length ? list1.length : list2.length;
+  return List.generate(minLength, (i) => list1[i] + list2[i]);
 }
