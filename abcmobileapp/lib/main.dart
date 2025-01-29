@@ -4,7 +4,6 @@ import 'events_page.dart';
 import 'base_layout.dart';
 import 'app_colors.dart';
 import 'model.dart';
-import 'dart:convert';
 import 'settings.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -44,7 +43,7 @@ class _MainAppState extends State<MainApp> {
   final String _userId = "U1";
   int _currentIndex = 1;
   final PageController _pageController = PageController(initialPage: 1);
-  late List<Event> _events = [];
+  List<Event> _events = [];
   late User _userData;
   
   @override
@@ -64,7 +63,7 @@ class _MainAppState extends State<MainApp> {
       final handler = FirebaseHandler();
       User userData = await handler.fetchUserData(_userId);
       setState((){
-        _userData= userData;
+        _userData = userData;
       });
 
       List<Event> userEvents = await handler.fetchEvents(_userData.eventId);
@@ -119,7 +118,8 @@ class _MainAppState extends State<MainApp> {
             onTabTapped: _onTabTapped,
             child: EventsPage(
               userData: _userData,
-              events: _events
+              events: _events,
+              onEventUpdated: _loadUserData,
             ),
           ),
         ],

@@ -254,8 +254,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                               onPressed: (index) {
                                                 setState(() {
                                                   isEvenSplit = index == 0;
-                                                  print(
-                                                      "isEventSplit=$isEvenSplit");
                                                   _updateCostSplit();
                                                 });
                                               },

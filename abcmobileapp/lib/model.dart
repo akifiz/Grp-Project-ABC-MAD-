@@ -194,36 +194,32 @@ class FirebaseHandler {
 
   }
 
+  Future<void> deleteEvent(Event event) async{
+   try{
+    //delete Expenses
+    QuerySnapshot expensesSnapshot = await _firestore.collection("EVENTS").doc(event.eventId).collection("EXPENSES").get();
+    for (var doc in expensesSnapshot.docs) {
+        await doc.reference.delete(); // Delete each document inside the subcollection
+    }
 
+    //delete the event
+    await _firestore.collection("EVENTS").doc(event.eventId).delete().then(
+            (doc) => print("${event.eventId} deleted"),
+            onError: (e) => print("Error updating EVENTS: $e"),
+          );
 
-  // // Add a new expense to the "expenses" collection
-  // Future<void> addExpense(String name, String email, int age) async {
-  //   try {
-  //     await _firestore.collection('Expenses').add({
-  //       '': name,
-  //       'email': email,
-  //       'age': age,
-  //     });
-  //     print('expense added successfully!');
-  //   } catch (e) {
-  //     print('Error adding expense: $e');
-  //   }
-  // }
+    //update users eventId
+    for(var i = 0; i < event.userId.length; i++){
+      await _firestore.collection("USERS").doc(event.userId[i]).update({
+          'eventId': FieldValue.arrayRemove([event.eventId])
+      });
+    }
 
-  // // Update an existing expense's data by document ID
-  // Future<void> updateExpense(
-  //     String docId, String name, String email, int age) async {
-  //   try {
-  //     await _firestore.collection('expenses').doc(docId).update({
-  //       'name': name,
-  //       'email': email,
-  //       'age': age,
-  //     });
-  //     print('expense updated successfully!');
-  //   } catch (e) {
-  //     print('Error updating expense: $e');
-  //   }
-  // }
+  } catch (e){
+    print("Error deleting event ${event.eventId} on firestore: $e");
+  }   
+
+  }
 }
 
 String createRepeatingPattern(String pattern, int times) {
