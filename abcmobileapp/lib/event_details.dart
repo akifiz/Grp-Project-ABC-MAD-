@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'model.dart';
+import 'package:intl/intl.dart';
 
 class EventDetailsPage extends StatefulWidget {
   final User userData;
@@ -40,8 +41,16 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   }
 
 
-  void _sendMessage() {
-    //do something
+  void _addExpense(Expense expense) {
+    try {
+      final handler = FirebaseHandler();
+      setState(() {
+        handler.createExpense(expense, widget.event.eventId);
+        _expenses.add(expense);
+      });
+    } catch (e) {
+      print('Error adding an expense: $e');
+    }
   }
 
   @override
@@ -157,7 +166,17 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                 TextButton(
                                   onPressed: () {
                                     Navigator.of(context).pop();
-                                    _sendMessage();
+                                    _addExpense(
+                                      new Expense(
+                                        id: "EXP${_expenses.length + 1}",
+                                        title: "Expense EXP${_expenses.length + 1}",
+                                        amount: 100,
+                                        paidBy: widget.userData.userId,
+                                        split: "SPLIT",
+                                        date: DateFormat('d MMMM yyyy').format(DateTime.now()),
+                                        time: DateFormat('h:mm a').format(DateTime.now()), 
+                                      )
+                                    );
                                   },
                                   child: Text('Submit'),
                                 ),
