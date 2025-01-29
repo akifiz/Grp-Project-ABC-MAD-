@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:core';
 
-class User{
+class User {
   final String userId;
   final String defaultName;
   final List<String> eventId;
@@ -9,7 +9,7 @@ class User{
   User({
     required this.userId,
     required this.defaultName,
-    required this. eventId,
+    required this.eventId,
   });
 
   factory User.fromFirestore(DocumentSnapshot doc) {
@@ -20,14 +20,13 @@ class User{
       eventId: List<String>.from(data['eventId'] ?? []),
     );
   }
-
 }
+
 class Event {
   final String eventId;
   final String title;
   final String date;
   final String time;
-  final String finalBalance;
   final List<String> userId;
 
   Event({
@@ -35,7 +34,6 @@ class Event {
     required this.title,
     required this.date,
     required this.time,
-    required this.finalBalance,
     required this.userId,
   });
 
@@ -45,12 +43,10 @@ class Event {
       title: data['title'],
       date: data['date'],
       time: data['time'],
-      finalBalance: data['finalBalance'],
       userId: List<String>.from(data['userId']),
     );
   }
 }
-
 
 class Expense {
   final String id;
@@ -61,7 +57,14 @@ class Expense {
   final String date;
   final String time;
 
-  Expense({required this.id, required this.title, required this.amount, required this.paidBy, required this.split, required this.date, required this.time});
+  Expense(
+      {required this.id,
+      required this.title,
+      required this.amount,
+      required this.paidBy,
+      required this.split,
+      required this.date,
+      required this.time});
 
   // Factory method to create a expense object from a Firestore document
   factory Expense.fromFirestore(Map<String, dynamic> data) {
@@ -76,7 +79,6 @@ class Expense {
     );
   }
 }
-
 
 class FirebaseHandler {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -99,13 +101,12 @@ class FirebaseHandler {
     }
   }
 
-
-  // Fetch all events from the "EVENTS" collection based on list of events 
+  // Fetch all events from the "EVENTS" collection based on list of events
   Future<List<Event>> fetchEvents(List<String> eventList) async {
     try {
       QuerySnapshot querySnapshot = await _firestore
           .collection('EVENTS')
-          .where("eventId", whereIn:eventList)
+          .where("eventId", whereIn: eventList)
           .get();
       List<Event> events = querySnapshot.docs.map((doc) {
         return Event.fromFirestore(doc.data() as Map<String, dynamic>);
@@ -117,20 +118,48 @@ class FirebaseHandler {
     }
   }
 
-  Future<User> fetchUserData(String userId) async{
+  Future<User> fetchUserData(String userId) async {
     try {
-      DocumentSnapshot doc = await _firestore
-          .collection('USERS')
-          .doc(userId)
-          .get();
+      DocumentSnapshot doc =
+          await _firestore.collection('USERS').doc(userId).get();
       return User.fromFirestore(doc);
     } catch (e) {
       print('Error fetching user data: $e');
     }
-      throw new Exception("Error fetching user ${userId} data");
+    throw new Exception("Error fetching user ${userId} data");
   }
 
+  Future<void> createEvent(Event event) async {
+  try{
+    await _firestore.collection('EVENTS').doc(event.eventId).set({
+      'eventId': event.eventId,
+      'title': event.title,
+      'date': event.date,
+      'time': event.time, 
+      'userId': List<String>.from(event.userId),
+    });
 
+    for(var i = 0; i < event.userId.length; i++){
+      await _firestore
+          .collection('EVENTS')
+          .doc(event.eventId)
+          .collection('BALANCE') 
+          .doc(event.userId[i])
+          .set({
+        '${event.userId[i]}': event.userId[i],
+        'balance': List.filled(event.userId.length, 0.0),
+      });
+      await _firestore
+          .collection('USERS')
+          .doc(event.userId[i])
+          .update({
+            'eventId': FieldValue.arrayUnion([event.eventId]),
+          });
+    }
+  } catch (e){
+    print("Error creating an event");
+  }
+  }
 
   // // Add a new expense to the "expenses" collection
   // Future<void> addExpense(String name, String email, int age) async {

@@ -30,8 +30,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   Future<void> _loadExpenses() async{
     try {
       final handler = FirebaseHandler();
-      //TODO: change "E1" to widget.event.eventId once the event object passing is implemented
-      List<Expense> eventExpenses = await handler.fetchExpenses("E1");
+      List<Expense> eventExpenses = await handler.fetchExpenses(widget.event.eventId);
       setState(() {
         _expenses = eventExpenses;
       });
