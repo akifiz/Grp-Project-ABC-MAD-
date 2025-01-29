@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:core';
 
 class User{
   final String userId;
@@ -10,6 +11,15 @@ class User{
     required this.defaultName,
     required this. eventId,
   });
+
+  factory User.fromFirestore(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return User(
+      userId: data['userId'] ?? '',
+      defaultName: data['defaultName'],
+      eventId: List<String>.from(data['eventId'] ?? []),
+    );
+  }
 
 }
 class Event {
@@ -107,21 +117,18 @@ class FirebaseHandler {
     }
   }
 
-  // User fetchUserData(String userId) async{
-  //   try {
-  //     QuerySnapshot querySnapshot = await _firestore
-  //         .collection('USERS')
-  //         .where("userId", isEqualTo:userId)
-  //         .get();
-  //     List<Event> events = querySnapshot.docs.map((doc) {
-  //       return fromFirestore(doc.data() as Map<String, dynamic>);
-  //     }).toList();
-  //     return events;
-  //   } catch (e) {
-  //     print('Error fetching user data: $e');
-  //     return [];
-  //   }
-  // }
+  Future<User> fetchUserData(String userId) async{
+    try {
+      DocumentSnapshot doc = await _firestore
+          .collection('USERS')
+          .doc(userId)
+          .get();
+      return User.fromFirestore(doc);
+    } catch (e) {
+      print('Error fetching user data: $e');
+    }
+      throw new Exception("Error fetching user ${userId} data");
+  }
 
 
 
