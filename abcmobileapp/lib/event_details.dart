@@ -4,12 +4,10 @@ import 'model.dart';
 import 'package:intl/intl.dart';
 
 class EventDetailsPage extends StatefulWidget {
-  final User userData;
   final Event event;
 
   const EventDetailsPage({
     Key? key,
-    required this.userData,
     required this.event,
   }) : super(key: key);
 
@@ -33,7 +31,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     super.initState();
     _loadExpenses();
     numberOfUsers = widget.event.userId.length;
-    _userIndex = widget.event.userId.indexOf(widget.userData.userId);
+    _userIndex = widget.event.userId.indexOf(userId);
     _generateControllers();
   }
 

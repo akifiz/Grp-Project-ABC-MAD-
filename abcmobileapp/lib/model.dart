@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:core';
 
+final String userId = "U1";
 class User {
   final String userId;
   final String defaultName;
@@ -142,6 +143,7 @@ class FirebaseHandler {
       'title': event.title,
       'date': event.date,
       'time': event.time, 
+      'totalSpending': event.totalSpending,
       'userId': List<String>.from(event.userId),
     });
 

@@ -8,13 +8,11 @@ import 'tilebutton.dart';
 import 'package:intl/intl.dart';
 
 class EventsPage extends StatefulWidget {
-  final User userData;
   final List<Event> events;
   final Function() onEventUpdated;
 
   const EventsPage({
     Key? key,
-    required this.userData,
     required this.events,
     required this.onEventUpdated,
   }) : super(key: key);
@@ -209,7 +207,7 @@ class _EventsPageState extends State<EventsPage> {
                     new Event(
                       eventId: "E${widget.events.length + 1}",
                       title: "Event E${widget.events.length + 1}",
-                      totalSpending: 0,
+                      totalSpending: 0.0,
                       userId: ['U1','U2'],
                       date: DateFormat('d MMMM yyyy').format(DateTime.now()),
                       time: DateFormat('h:mm a').format(DateTime.now()),
@@ -261,7 +259,6 @@ class _EventsPageState extends State<EventsPage> {
     final handler = FirebaseHandler();
     setState(() {
       handler.createEvent(event);
-      widget.onEventUpdated();
       widget.events.add(event);
     });
 
@@ -326,7 +323,6 @@ class _EventsPageState extends State<EventsPage> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => EventDetailsPage(
-                                userData: widget.userData,
                                 event: widget.events[index],
                               ),
                             ),
