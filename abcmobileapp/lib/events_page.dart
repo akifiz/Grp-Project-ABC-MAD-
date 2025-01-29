@@ -5,6 +5,7 @@ import 'event_details.dart';
 import 'app_colors.dart';
 import 'model.dart';
 import 'tilebutton.dart';
+import 'package:intl/intl.dart';
 
 class EventsPage extends StatefulWidget {
   final User userData;
@@ -202,6 +203,15 @@ class _EventsPageState extends State<EventsPage> {
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
                   //TODO: handle adding events to firebase
+                  _addEvent(
+                    new Event(
+                      eventId: "E${widget.events.length}",
+                      title: "Another event",
+                      userId: ['U1','U2'],
+                      date: DateFormat('d MMMM yyyy').format(DateTime.now()),
+                      time: DateFormat('d MMMM yyyy').format(DateTime.now()), 
+                    )
+                  );
                   Navigator.pop(context);
                   
                   // Show confirmation
@@ -242,6 +252,16 @@ class _EventsPageState extends State<EventsPage> {
       ),
     );
   }
+
+  void _addEvent(Event event) {
+    final handler = FirebaseHandler();
+    setState(() {
+      handler.createEvent(event);
+      widget.events.add(event);
+    });
+
+  }
+
 
   @override
   Widget build(BuildContext context) {

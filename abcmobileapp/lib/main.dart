@@ -77,22 +77,7 @@ class _MainAppState extends State<MainApp> {
     }
   }
 
-  Future<void> _saveEvents() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final String eventsJson = '';//jsonEncode(events.map((event) => event.toJson()).toList());
-      await prefs.setString('events', eventsJson);
-    } catch (e) {
-      print('Error saving events: $e');
-    }
-  }
 
-  // void _addEvent(Event event) {
-  //   setState(() {
-  //     _events.add(event);
-  //   });
-  //   _saveEvents();
-  // }
 
   // void _updateEvent(Event event) {
   //   // final index = events.indexWhere((e) => e.id == event.id);
