@@ -161,6 +161,23 @@ class FirebaseHandler {
   }
   }
 
+  Future<void> createExpense(Expense expense, String eventId) async{
+   try{
+    await _firestore.collection('EVENTS').doc(eventId).collection('EXPENSES').doc(expense.id).set({
+      'id': expense.id,
+      'title': expense.title,
+      'amount': expense.amount,
+      'paidBy': expense.paidBy,
+      'split': expense.split,
+      'date': expense.date,
+      'time': expense.time,
+    });
+
+  } catch (e){
+    print("Error creating an expense");
+  }   
+  }
+
   // // Add a new expense to the "expenses" collection
   // Future<void> addExpense(String name, String email, int age) async {
   //   try {

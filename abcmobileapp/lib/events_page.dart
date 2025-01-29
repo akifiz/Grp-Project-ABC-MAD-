@@ -208,7 +208,7 @@ class _EventsPageState extends State<EventsPage> {
                       title: "Event E${widget.events.length + 1}",
                       userId: ['U1','U2'],
                       date: DateFormat('d MMMM yyyy').format(DateTime.now()),
-                      time: DateFormat('hh.mm a').format(DateTime.now()), 
+                      time: DateFormat('h:mm a').format(DateTime.now()), 
                     )
                   );
                   Navigator.pop(context);
