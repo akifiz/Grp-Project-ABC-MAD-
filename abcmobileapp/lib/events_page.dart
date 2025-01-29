@@ -7,10 +7,12 @@ import 'model.dart';
 import 'tilebutton.dart';
 
 class EventsPage extends StatefulWidget {
+  final User userData;
   final List<Event> events;
 
   const EventsPage({
     Key? key,
+    required this.userData,
     required this.events,
   }) : super(key: key);
 
@@ -299,6 +301,7 @@ class _EventsPageState extends State<EventsPage> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => EventDetailsPage(
+                                userData: widget.userData,
                                 event: event,
                               ),
                             ),
