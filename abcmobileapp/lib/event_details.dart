@@ -102,7 +102,10 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         foregroundColor: Colors.white,
       ),
       body: Column(children: [
-        Text("Total Spent: ${widget.event.totalSpending}\nYour spending: ${mapToDoubleList(widget.event.balance[_userIndex])[_userIndex]}\nBalance: ${widget.event.balance[_userIndex]}"),
+        Text(
+          "Total Spent: ${widget.event.totalSpending}\nYour spending: ${mapToDoubleList(widget.event.balance[_userIndex])[_userIndex]}\nBalance: ${widget.event.balance[_userIndex]}",
+          style: TextStyle(color: Colors.black, backgroundColor: const Color.fromARGB(255, 240, 215, 245)),
+        ),
         Divider(height: 1),
         Expanded(
           child: ListView.builder(
