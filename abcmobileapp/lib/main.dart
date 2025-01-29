@@ -4,7 +4,6 @@ import 'events_page.dart';
 import 'base_layout.dart';
 import 'app_colors.dart';
 import 'model.dart';
-import 'dart:convert';
 import 'settings.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -41,11 +40,9 @@ class MainApp extends StatefulWidget {
 
 class _MainAppState extends State<MainApp> {
   //TODO: fetch userId based on account login
-  final String _userId = "U1";
   int _currentIndex = 1;
   final PageController _pageController = PageController(initialPage: 1);
-  late List<Event> _events = [];
-  late User _userData;
+  List<Event> _events = [];
   
   @override
   void initState() {
@@ -62,10 +59,7 @@ class _MainAppState extends State<MainApp> {
   Future<void> _loadUserData() async {
     try {
       final handler = FirebaseHandler();
-      User userData = await handler.fetchUserData(_userId);
-      setState((){
-        _userData= userData;
-      });
+      User _userData = await handler.fetchUserData(userId);
 
       List<Event> userEvents = await handler.fetchEvents(_userData.eventId);
       setState(() {
@@ -103,14 +97,12 @@ class _MainAppState extends State<MainApp> {
             currentIndex: _currentIndex,
             onTabTapped: _onTabTapped,
             child: SettingsPage(
-              userData: _userData,
             ),
           ),
           BaseLayout(
             currentIndex: _currentIndex,
             onTabTapped: _onTabTapped,
             child: DashboardPage(
-              userData: _userData,
               events: _events
             ),
           ),
@@ -118,8 +110,8 @@ class _MainAppState extends State<MainApp> {
             currentIndex: _currentIndex,
             onTabTapped: _onTabTapped,
             child: EventsPage(
-              userData: _userData,
-              events: _events
+              events: _events,
+              onEventUpdated: _loadUserData,
             ),
           ),
         ],

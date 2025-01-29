@@ -3,12 +3,10 @@ import 'app_colors.dart';
 import 'model.dart';
 
 class DashboardPage extends StatelessWidget {
-  final User userData;
   final List<Event> events;
 
   const DashboardPage({
     Key? key,
-    required this.userData,
     required this.events,
   }) : super(key: key);
 

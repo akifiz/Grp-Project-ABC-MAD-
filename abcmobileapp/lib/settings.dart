@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'app_colors.dart';
-import 'model.dart';
 
 class SettingsPage extends StatefulWidget {
-  final User userData;
   const SettingsPage({
     Key? key,
-    required this.userData,
     }) : super(key: key);
 
   @override
