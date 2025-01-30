@@ -249,7 +249,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                 color: Colors.white),
                           ),
                           Text(
-                            "Paid By: ${paidBy}",
+                            "Paid By: ${widget.event.userName?[paidBy]}",
                             style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
