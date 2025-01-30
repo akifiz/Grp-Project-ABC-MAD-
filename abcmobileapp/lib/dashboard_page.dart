@@ -25,6 +25,7 @@ class _DashboardPageState extends State<DashboardPage> {
         if (firstUserBalance.isNotEmpty) {
           totalBalance += firstUserBalance.reduce((a, b) => a + b);
         }
+
       }
     }
     return totalBalance;
@@ -74,7 +75,9 @@ class _DashboardPageState extends State<DashboardPage> {
         ),
         const SizedBox(height: 20),
 
+
         // Current Balance Section
+
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Text(
@@ -88,6 +91,7 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
         ),
         const SizedBox(height: 10),
+
 
         // Wider Balance Table
         Container(

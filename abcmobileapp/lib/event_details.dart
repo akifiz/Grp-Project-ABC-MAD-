@@ -1,8 +1,9 @@
+// ignore_for_file: prefer_interpolation_to_compose_strings
+
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'model.dart';
 import 'package:intl/intl.dart';
-import 'firebase_options.dart';
 import 'currency.dart';
 
 class EventDetailsPage extends StatefulWidget {
@@ -39,6 +40,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     'JPY': '¥'
   };
 
+  List<String> userName = [''];
 
   @override
   void initState() {
@@ -46,7 +48,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     _loadExpenses();
     numberOfUsers = widget.event.userId.length;
     _userIndex = widget.event.userId.indexOf(global_userId);
-    _generateControllers();
+    _generateControllers(); 
+    userName = widget.event.userName!;
   }
 
   void _generateControllers() {
@@ -169,6 +172,24 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     return result;
   }
 
+
+  String printBalance(int userIndex, String splitString, List<String> userName) {
+    if(userName.length == 1) return "";
+    List<double> split = mapToDoubleList(splitString);
+    String result = "|";
+    for (var i = 0; i < split.length; i++) {
+      if(i==userIndex) continue;
+      if(split[i] > 0){
+        result += " ${userName[i]} owes you ${moneyFormat(_currencyAppend, split[i], _exchangeRate)} |";
+      }else if(split[i] < 0){
+        result += " you owe ${userName[i]} ${moneyFormat(_currencyAppend, split[i], _exchangeRate)} |";
+      }else{
+        result += " ~ |";
+      }
+    }
+    return result;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -188,7 +209,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         Text(
           "Total Spent: ${moneyFormat(_currencyAppend, widget.event.totalSpending, _exchangeRate)}\n"+
           "Your spending: ${moneyFormat(_currencyAppend, mapToDoubleList(widget.event.balance[_userIndex])[_userIndex], _exchangeRate)}\n"+
-          "Balance: ${widget.event.balance[_userIndex]}",
+          "${printBalance(_userIndex, widget.event.balance[_userIndex], userName)}",
           style: TextStyle(
               color: Colors.black,
               backgroundColor: const Color.fromARGB(255, 240, 215, 245)),
