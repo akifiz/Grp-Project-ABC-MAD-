@@ -72,7 +72,7 @@ class _MainAppState extends State<MainApp> {
       final handler = FirebaseHandler();
       User userData = await handler.fetchUserData(userId);
       List<Event> userEvents = await handler.fetchEvents(userData.eventId);
-      
+
       setState(() {
         _userData = userData;
         _events = userEvents;

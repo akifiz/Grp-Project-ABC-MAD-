@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:core';
 
 final String userId = "U1";
+
 class User {
   final String userId;
   final String defaultName;
@@ -251,3 +252,38 @@ String createRepeatingPattern(String pattern, int times) {
   return List.generate(times, (index) => pattern).join('');
 }
 
+String moneyFormat(String currency, double amountMyr,
+    [double exchangeRate = 1]) {
+  amountMyr *= exchangeRate;
+  return "${currency}${amountMyr.toStringAsFixed(2)}";
+}
+
+//helper methods
+List<double> mapToDoubleList(String str) {
+  return str
+      .split(',') // Split by comma
+      .where((s) => s.isNotEmpty) // Remove empty values
+      .map((s) => double.parse(s)) // Convert to double
+      .toList();
+}
+
+List<List<double>> mapToDoubleListList(List<String> stringList) {
+  return stringList.map((str) {
+    return mapToDoubleList(str);
+  }).toList();
+}
+
+List<String> doubleListListToStringList(List<List<double>> doubleList) {
+  return doubleList.map((innerList) {
+    return innerList.map((d) => d.toString()).join(',');
+  }).toList();
+}
+
+String doubleListToString(List<double> doubleList) {
+  return doubleList.map((d) => d.toString()).join(',');
+}
+
+List<double> addDoubleLists(List<double> list1, List<double> list2) {
+  int minLength = list1.length < list2.length ? list1.length : list2.length;
+  return List.generate(minLength, (i) => list1[i] + list2[i]);
+}

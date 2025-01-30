@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'model.dart';
 import 'package:intl/intl.dart';
+import 'firebase_options.dart';
+import 'currency.dart';
+
 class EventDetailsPage extends StatefulWidget {
   final User userData;
   final Event event;
@@ -19,13 +22,16 @@ class EventDetailsPage extends StatefulWidget {
 class _EventDetailsPageState extends State<EventDetailsPage> {
   List<Expense> _expenses = [];
   late int _userIndex;
-
   int numberOfUsers = 1; // Default number of users
   double amount = 0.0;
   bool isEvenSplit = true;
   final List<TextEditingController> costControllers = [];
   final TextEditingController amountController = TextEditingController();
   final TextEditingController titleController = TextEditingController();
+
+  String currencyString = 'RM';
+  String currency = 'MYR';
+  double exchangeRate = 1;
 
   @override
   void initState() {
@@ -79,6 +85,19 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     }
   }
 
+  Future<void> _loadExchangeRate(String currency)async{
+    if(currency=='MYR'){
+      exchangeRate = 1;
+      return;
+    }
+    try{
+      final String fromCurrency = 'MYR';
+      exchangeRate = await getExchangeRate(fromCurrency, currency);
+    }catch(e){
+      print("Failed to load exchange rate");
+    }
+  }
+
   Future<void> _updateBalance(Expense newExpense) async {
     try {
       List<String> newBalance =
@@ -96,7 +115,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   }
 
   List<String> calculateBalance(
-      List<String> originalBalance, Expense newExpense) {
+    List<String> originalBalance, Expense newExpense) {
     List<List<double>> balance = mapToDoubleListList(originalBalance);
     List<double> costSplit = mapToDoubleList(newExpense.split);
     int payerIndex = newExpense.paidBy;
@@ -121,34 +140,128 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text(widget.event.title),
-        backgroundColor: AppColors.text,
-        foregroundColor: Colors.white,
-      ),
+          title: Text(widget.event.title),
+          backgroundColor: AppColors.text,
+          foregroundColor: Colors.white,
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.currency_exchange),
+              tooltip: 'Change Currency',
+              onPressed: () {
+                setState(() {
+                  currency = 'USD';
+                  currencyString = 'US\$';
+                });
+                _loadExchangeRate(currency);
+              },
+            ),
+          ]),
       body: Column(children: [
         Text(
-          "Total Spent: ${widget.event.totalSpending}\nYour spending: ${mapToDoubleList(widget.event.balance[_userIndex])[_userIndex]}\nBalance: ${widget.event.balance[_userIndex]}",
+          "Total Spent: ${moneyFormat(currencyString, widget.event.totalSpending, exchangeRate)}\n"+
+          "Your spending: ${moneyFormat(currencyString, mapToDoubleList(widget.event.balance[_userIndex])[_userIndex], exchangeRate)}\n"+
+          "Balance: ${widget.event.balance[_userIndex]}",
           style: TextStyle(
               color: Colors.black,
               backgroundColor: const Color.fromARGB(255, 240, 215, 245)),
         ),
         Divider(height: 1),
         Expanded(
-          child: ListView.builder(
-            reverse: true, // Messages start from the bottom
-            itemCount: _expenses.length,
-            itemBuilder: (context, index) {
-              return ExpenseBubble(
-                title: _expenses[_expenses.length - 1 - index].title,
-                amount: _expenses[_expenses.length - 1 - index].amount,
-                paidBy: _expenses[_expenses.length - 1 - index].paidBy,
-                split: _expenses[_expenses.length - 1 - index].split,
-                date: _expenses[_expenses.length - 1 - index].date,
-                time: _expenses[_expenses.length - 1 - index].time,
-              );
-            },
-          ),
-        ),
+            child: ListView.builder(
+          reverse: true, // Messages start from the bottom
+          itemCount: _expenses.length,
+          itemBuilder: (context, index) {
+            String title = _expenses[_expenses.length - 1 - index].title;
+            double amount = _expenses[_expenses.length - 1 - index].amount;
+            int paidBy = _expenses[_expenses.length - 1 - index].paidBy;
+            String split = _expenses[_expenses.length - 1 - index].split;
+            String date = _expenses[_expenses.length - 1 - index].date;
+            String time = _expenses[_expenses.length - 1 - index].time;
+            return Align(
+                alignment: Alignment.center,
+                child: Container(
+                  margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+                  padding: EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        const Color.fromARGB(255, 215, 55, 82),
+                        const Color.fromARGB(255, 139, 37, 37)
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(12),
+                      topRight: Radius.circular(12),
+                      bottomLeft: Radius.circular(12),
+                      bottomRight: Radius.circular(12),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        offset: Offset(4, 4), // Shadow direction
+                        blurRadius: 10, // Softness of the shadow
+                        spreadRadius: 1, // How far the shadow spreads
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 8.0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Amount: ${moneyFormat(currencyString, amount, exchangeRate)}",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white),
+                          ),
+                          Text(
+                            "Paid By: ${paidBy}",
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.white),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 4.0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Split: ${split}",
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.white),
+                          ),
+                          Text(
+                            "${date} at ${time}",
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ));
+          },
+        )),
         Divider(height: 1),
         Container(
             color: AppColors.text,
@@ -169,12 +282,19 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                             builder: (BuildContext context) {
                               String? splitErrorMessage;
                               String? titleErrorMessage;
-                              return StatefulBuilder(builder: (context,setState){   
-                                  bool _validateSplit() {
-                                  double totalCost = costControllers.fold( 0.0,(sum, controller) => sum +(double.tryParse(controller.text) ?? 0.0));
+                              return StatefulBuilder(
+                                  builder: (context, setState) {
+                                bool _validateSplit() {
+                                  double totalCost = costControllers.fold(
+                                      0.0,
+                                      (sum, controller) =>
+                                          sum +
+                                          (double.tryParse(controller.text) ??
+                                              0.0));
                                   if (totalCost != amount) {
                                     setState(() {
-                                      splitErrorMessage = 'Total cost split must add up to the amount';
+                                      splitErrorMessage =
+                                          'Total cost split must add up to the amount';
                                     });
                                     return false;
                                   }
@@ -184,10 +304,11 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                   return true;
                                 }
 
-                                bool _validateTitle(){
-                                  if(titleController.text == ''){
+                                bool _validateTitle() {
+                                  if (titleController.text == '') {
                                     setState(() {
-                                      titleErrorMessage = 'Expense title cannot be empty';
+                                      titleErrorMessage =
+                                          'Expense title cannot be empty';
                                     });
                                     return false;
                                   }
@@ -196,6 +317,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                   });
                                   return true;
                                 }
+
                                 return AlertDialog(
                                   title: const Text('Add Expense'),
                                   content: SizedBox(
@@ -220,25 +342,30 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                           ),
                                         const SizedBox(height: 8),
                                         TextField(
-                                          keyboardType: TextInputType.number,
-                                          decoration: const InputDecoration(
-                                              labelText: 'Amount'),
-                                          controller: amountController,
-                                          onChanged: (value) {
-                                            double? parsedValue = double.tryParse(value);
-                                            if (parsedValue != null && parsedValue >= 0) {
-                                              setState(() {
-                                                amount = parsedValue;
-                                                _updateCostSplit();
-                                              });
-                                            } else {
-                                              amountController.text = ''; // Reset to zero if input is negative
-                                              amountController.selection = TextSelection.fromPosition(
-                                                TextPosition(offset: amountController.text.length),
-                                              );
-                                            } 
-                                          }
-                                        ),
+                                            keyboardType: TextInputType.number,
+                                            decoration: const InputDecoration(
+                                                labelText: 'Amount'),
+                                            controller: amountController,
+                                            onChanged: (value) {
+                                              double? parsedValue =
+                                                  double.tryParse(value);
+                                              if (parsedValue != null &&
+                                                  parsedValue >= 0) {
+                                                setState(() {
+                                                  amount = parsedValue;
+                                                  _updateCostSplit();
+                                                });
+                                              } else {
+                                                amountController.text =
+                                                    ''; // Reset to zero if input is negative
+                                                amountController.selection =
+                                                    TextSelection.fromPosition(
+                                                  TextPosition(
+                                                      offset: amountController
+                                                          .text.length),
+                                                );
+                                              }
+                                            }),
                                         const SizedBox(height: 8),
                                         Row(
                                           mainAxisAlignment:
@@ -277,7 +404,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                         if (splitErrorMessage != null)
                                           Text(
                                             splitErrorMessage!,
-                                            style: const TextStyle(color: Colors.red),
+                                            style: const TextStyle(
+                                                color: Colors.red),
                                           ),
                                         const SizedBox(height: 8),
                                         SizedBox(
@@ -298,9 +426,16 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                                     const SizedBox(width: 8),
                                                     Expanded(
                                                       child: TextField(
-                                                        controller:costControllers[index],
-                                                        keyboardType: TextInputType.number,
-                                                        decoration: const InputDecoration(labelText:'Cost'),
+                                                        controller:
+                                                            costControllers[
+                                                                index],
+                                                        keyboardType:
+                                                            TextInputType
+                                                                .number,
+                                                        decoration:
+                                                            const InputDecoration(
+                                                                labelText:
+                                                                    'Cost'),
                                                         enabled: !isEvenSplit,
                                                       ),
                                                     ),
@@ -321,9 +456,14 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                     ),
                                     ElevatedButton(
                                       onPressed: () {
-                                        if (_validateSplit() && _validateTitle()) {
-                                          List<double> costValues = costControllers
-                                                  .map((controller) =>double.tryParse(controller.text) ?? 0.0)
+                                        if (_validateSplit() &&
+                                            _validateTitle()) {
+                                          List<double> costValues =
+                                              costControllers
+                                                  .map((controller) =>
+                                                      double.tryParse(
+                                                          controller.text) ??
+                                                      0.0)
                                                   .toList();
 
                                           _addExpense(new Expense(
@@ -340,156 +480,20 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                             time: DateFormat('h:mm a')
                                                 .format(DateTime.now()),
                                           ));
+                                          titleController.clear();
+                                          amountController.clear();
                                           Navigator.of(context).pop();
                                         }
-
                                       },
                                       child: const Text('Submit'),
                                     ),
                                   ],
                                 );
                               });
-                            
                             });
                       }),
                 ])))
       ]),
     );
   }
-}
-
-class ExpenseBubble extends StatelessWidget {
-  final String title;
-  final double amount;
-  final int paidBy;
-  final String split;
-  final String date;
-  final String time;
-
-  const ExpenseBubble({
-    Key? key,
-    required this.title,
-    required this.amount,
-    required this.paidBy,
-    required this.split,
-    required this.date,
-    required this.time,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-        alignment: Alignment.center,
-        child: Container(
-          margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
-          padding: EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                const Color.fromARGB(255, 215, 55, 82),
-                const Color.fromARGB(255, 139, 37, 37)
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(12),
-              topRight: Radius.circular(12),
-              bottomLeft: Radius.circular(12),
-              bottomRight: Radius.circular(12),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                offset: Offset(4, 4), // Shadow direction
-                blurRadius: 10, // Softness of the shadow
-                spreadRadius: 1, // How far the shadow spreads
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              SizedBox(height: 8.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Amount: \$${amount.toStringAsFixed(2)}",
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white),
-                  ),
-                  Text(
-                    "Paid By: $paidBy",
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white),
-                  ),
-                ],
-              ),
-              SizedBox(height: 4.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Split: $split",
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white),
-                  ),
-                  Text(
-                    "$date at $time",
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ));
-  }
-}
-
-//helper methods
-List<double> mapToDoubleList(String str) {
-  return str
-      .split(',') // Split by comma
-      .where((s) => s.isNotEmpty) // Remove empty values
-      .map((s) => double.parse(s)) // Convert to double
-      .toList();
-}
-
-List<List<double>> mapToDoubleListList(List<String> stringList) {
-  return stringList.map((str) {
-    return mapToDoubleList(str);
-  }).toList();
-}
-
-List<String> doubleListListToStringList(List<List<double>> doubleList) {
-  return doubleList.map((innerList) {
-    return innerList.map((d) => d.toString()).join(',');
-  }).toList();
-}
-
-String doubleListToString(List<double> doubleList) {
-  return doubleList.map((d) => d.toString()).join(',');
-}
-
-List<double> addDoubleLists(List<double> list1, List<double> list2) {
-  int minLength = list1.length < list2.length ? list1.length : list2.length;
-  return List.generate(minLength, (i) => list1[i] + list2[i]);
 }
