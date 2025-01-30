@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'model.dart';
 import 'package:intl/intl.dart';
-import 'firebase_options.dart';
 class EventDetailsPage extends StatefulWidget {
   final User userData;
   final Event event;

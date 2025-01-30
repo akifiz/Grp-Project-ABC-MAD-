@@ -31,6 +31,7 @@ class Event {
   double totalSpending;
   List<String> userId;
   List<String> balance;
+  List<Expense>? expenses; 
 
   Event({
     required this.eventId,
@@ -40,6 +41,7 @@ class Event {
     required this.totalSpending,
     required this.userId,
     required this.balance,
+    this.expenses, 
   });
 
   factory Event.fromFirestore(Map<String, dynamic> data) {
@@ -51,9 +53,11 @@ class Event {
       totalSpending: data['totalSpending'],
       userId: List<String>.from(data['userId']),
       balance: List<String>.from(data['balance']),
+      expenses: [], 
     );
   }
 }
+
 
 class Expense {
   final String id;
@@ -91,39 +95,58 @@ class FirebaseHandler {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // Fetch all expenses from the "expenses" collection of event id
-  Future<List<Expense>> fetchExpenses(String eventId) async {
-    try {
-      QuerySnapshot querySnapshot = await _firestore
-          .collection('EVENTS')
-          .doc(eventId)
-          .collection('EXPENSES')
-          .get();
-      List<Expense> expenses = querySnapshot.docs.map((doc) {
-        return Expense.fromFirestore(doc.data() as Map<String, dynamic>);
-      }).toList();
-      return expenses;
-    } catch (e) {
-      print('Error fetching expenses: $e');
-      return [];
-    }
-  }
+Future<List<Event>> fetchEvents(List<String> eventList) async {
+  try {
+    QuerySnapshot eventSnapshots = await FirebaseFirestore.instance
+        .collection('EVENTS')
+        .where("eventId", whereIn: eventList)
+        .get();
 
-  // Fetch all events from the "EVENTS" collection based on list of events
-  Future<List<Event>> fetchEvents(List<String> eventList) async {
-    try {
-      QuerySnapshot querySnapshot = await _firestore
-          .collection('EVENTS')
-          .where("eventId", whereIn: eventList)
-          .get();
-      List<Event> events = querySnapshot.docs.map((doc) {
-        return Event.fromFirestore(doc.data() as Map<String, dynamic>);
-      }).toList();
-      return events;
-    } catch (e) {
-      print('Error fetching events: $e');
-      return [];
+    List<Event> events = [];
+
+    for (var doc in eventSnapshots.docs) {
+      Map<String, dynamic> eventData = doc.data() as Map<String, dynamic>;
+
+      // Fetch expenses for this event
+      List<Expense> eventExpenses = await fetchExpenses(eventData['eventId']);
+
+      // Create event object including expenses
+      events.add(Event(
+        eventId: eventData['eventId'],
+        title: eventData['title'],
+        date: eventData['date'],
+        time: eventData['time'],
+        totalSpending: eventData['totalSpending'],
+        userId: List<String>.from(eventData['userId']),
+        balance: List<String>.from(eventData['balance']),
+        expenses: eventExpenses, // ✅ Load expenses into event
+      ));
     }
+    return events;
+  } catch (e) {
+    print('Error fetching events: $e');
+    return [];
   }
+}
+
+// ✅ Helper function to fetch expenses for an event
+Future<List<Expense>> fetchExpenses(String eventId) async {
+  try {
+    QuerySnapshot expenseSnapshots = await FirebaseFirestore.instance
+        .collection('EVENTS')
+        .doc(eventId)
+        .collection('EXPENSES')
+        .get();
+
+    return expenseSnapshots.docs.map((doc) {
+      return Expense.fromFirestore(doc.data() as Map<String, dynamic>);
+    }).toList();
+  } catch (e) {
+    print('Error fetching expenses for event $eventId: $e');
+    return [];
+  }
+}
+
 
   Future<User> fetchUserData(String userId) async {
     try {
