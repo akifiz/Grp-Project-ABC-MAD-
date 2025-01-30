@@ -342,20 +342,35 @@ Container(
                 ));
           },
         )),
-        Divider(height: 1),
-        Container(
-            color: AppColors.text,
-            padding: EdgeInsets.symmetric(vertical: 8),
-            child: Center(
-                child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                  ElevatedButton(
-                      onPressed: () {}, child: Text("Calculate Balance")),
-                  SizedBox(width: 10),
-                  ElevatedButton(
-                      child: Text("Add an expense"),
+   const Divider(height: 1, thickness: 1, color: Colors.grey),
+
+Container(
+  padding: const EdgeInsets.symmetric(vertical: 12),
+  child: Center(
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ElevatedButton(
+          onPressed: () {
+            
+          },
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: const Text("Pay Balance"),
+        ),
+        const SizedBox(width: 12),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: const Text("Add an Expense"),
                       onPressed: () {
                         showDialog(
                             context: context,
