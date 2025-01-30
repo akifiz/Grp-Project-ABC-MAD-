@@ -19,4 +19,8 @@ Our mobile app aims to streamline group spending by providing a user-friendly pl
 ## Screenshots
 
 ## HTTP library implementation
+![Screenshot 2025-01-31 000506](https://github.com/user-attachments/assets/6785e723-ddf5-4389-bca1-bfaba26e4317)
+
+![Screenshot 2025-01-30 235725](https://github.com/user-attachments/assets/186c1e6e-9ebb-498e-83c3-5d19dec38e5c)
+
 
