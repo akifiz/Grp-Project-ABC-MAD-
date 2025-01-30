@@ -1,5 +1,7 @@
 import 'package:abcmobileapp/model.dart';
+import 'package:abcmobileapp/sign_in_page.dart';
 import 'package:flutter/material.dart';
+import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'app_colors.dart';
 
@@ -120,9 +122,9 @@ class _SettingsPageState extends State<SettingsPage> {
         Padding(
           padding: const EdgeInsets.only(top: 16.0),
           child: Text(
-            'Hi, ' + global_userName,
+            'Hi, ' + global_defaultName + "\n UID:" + global_userId,
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
@@ -181,7 +183,9 @@ class _SettingsPageState extends State<SettingsPage> {
         ListTile(
           leading: Icon(Icons.exit_to_app, color: Colors.redAccent),
           title: Text('Logout', style: TextStyle(color: AppColors.main)),
-          onTap: () => _dummyLogout(context),
+          onTap: (){
+            exit(0);
+          }
         ),
         Divider(color: AppColors.subAlt),
       ],

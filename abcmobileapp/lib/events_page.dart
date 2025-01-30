@@ -92,6 +92,8 @@ class _EventsPageState extends State<EventsPage> {
                   });
                   return false;
                 }
+                
+
               }
               return true;
             }
@@ -129,7 +131,7 @@ class _EventsPageState extends State<EventsPage> {
                                   child: TextField(
                                     controller: participantControllers[index],
                                     decoration: InputDecoration(
-                                        labelText: 'Participant ${index + 1}'),
+                                        labelText: 'Participant ID${index + 1}'),
                                   ),
                                 ),
                                 if (participantControllers.length > 1)

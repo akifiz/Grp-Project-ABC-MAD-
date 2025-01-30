@@ -4,40 +4,58 @@ import 'model.dart';
 
 class DashboardPage extends StatefulWidget {
   final List<Event> events;
-  final VoidCallback onEventUpdated; // ✅ ADD THIS
+  final VoidCallback onEventUpdated;
 
   const DashboardPage({
     Key? key,
     required this.events,
-    required this.onEventUpdated, // ✅ ADD THIS
-
+    required this.onEventUpdated,
   }) : super(key: key);
 
   @override
-  _DashboardPageState createState() => _DashboardPageState(); // createState()
+  _DashboardPageState createState() => _DashboardPageState();
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  Map<String, double> _calculateBalances() {
-    final Map<String, double> balances = {};
-
-    for (var event in widget.events) { // ✅ Use widget.events inside StatefulWidget
-      if (event.userId.contains(global_userId) && event.expenses != null) {
-        for (var expense in event.expenses!) {
-          if (expense.paidBy == global_userId) {
-            balances[global_userId] = (balances[global_userId] ?? 0) + expense.amount;
-          } else {
-            balances[global_userId] = (balances[global_userId] ?? 0) - (expense.amount / event.userId.length);
-          }
+  double _calculateTotalBalance() {
+    double totalBalance = 0.0;
+    for (var event in widget.events) {
+      if (event.userId.isNotEmpty && event.balance.isNotEmpty) {
+        List<double> firstUserBalance = mapToDoubleList(event.balance[0]);
+        if (firstUserBalance.isNotEmpty) {
+          totalBalance += firstUserBalance.reduce((a, b) => a + b);
         }
       }
     }
-    return balances;
+    return totalBalance;
+  }
+
+  List<Expense> _getAllExpenses() {
+    List<Expense> allExpenses = [];
+    for (var event in widget.events) {
+      if (event.expenses != null) {
+        allExpenses.addAll(event.expenses!.where((expense) {
+          if (event.userId.isNotEmpty) {
+            List<double> splits = mapToDoubleList(expense.split);
+            return expense.paidBy == 0 || (splits.isNotEmpty && splits[0] > 0);
+          }
+          return false;
+        }));
+      }
+    }
+    allExpenses.sort((a, b) {
+      int dateComparison = b.date.compareTo(a.date);
+      if (dateComparison != 0) return dateComparison;
+      return b.time.compareTo(a.time);
+    });
+    return allExpenses;
   }
 
   @override
   Widget build(BuildContext context) {
-    final balances = _calculateBalances();
+    final totalBalance = _calculateTotalBalance();
+    final allExpenses = _getAllExpenses();
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -56,11 +74,11 @@ class _DashboardPageState extends State<DashboardPage> {
         ),
         const SizedBox(height: 20),
 
-        // Balances Section
+        // Balances Table Section
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Text(
-            'Current Balance (User 1)',
+            'Current Balance',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
@@ -71,133 +89,256 @@ class _DashboardPageState extends State<DashboardPage> {
         ),
         const SizedBox(height: 10),
 
-        if (balances.isEmpty)
-          Container(
-            height: 120,
-            padding: const EdgeInsets.symmetric(horizontal: 32.0),
-            child: Card(
-              color: AppColors.subAlt,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.check_circle_outline,
-                      color: AppColors.main.withOpacity(0.7),
-                      size: 32,
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      'No ongoing debts or credits',
-                      style: TextStyle(
-                        color: AppColors.main,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          )
-        else
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 32.0),
-            height: 120,
-            child: Card(
-              color: AppColors.subAlt,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Your Balance',
-                      style: TextStyle(
-                        color: AppColors.main,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'RM ${balances["U1"]?.toStringAsFixed(2) ?? "0.00"}',
-                      style: TextStyle(
-                        color: balances["U1"] != null && balances["U1"]! >= 0 ? Colors.green : Colors.red,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-        const SizedBox(height: 20),
-
-        // Recent Transactions Section
-        Padding(
+        // Updated table container with improved scrolling and centering
+        Container(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Text(
-            'Recent Transactions',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: AppColors.text,
+          alignment: Alignment.center, // Center the content horizontally
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: screenWidth > 800 ? 800 : screenWidth - 32, // Limit max width while staying responsive
             ),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        const SizedBox(height: 10),
+            child: Card(
+              color: AppColors.subAlt,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.4, // Maximum height (40% of screen height)
+                ),
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Table Header
+                              Table(
+                                defaultColumnWidth: const IntrinsicColumnWidth(),
+                                children: [
+                                  TableRow(
+                                    decoration: BoxDecoration(
+                                      border: Border(bottom: BorderSide(color: AppColors.main.withOpacity(0.2))),
+                                    ),
+                                    children: [
+                                      TableCell(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                          child: Text(
+                                            'EVENT',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.main,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      TableCell(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                          child: Text(
+                                            'DATE',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.main,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      TableCell(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                          child: Text(
+                                            'AMOUNT',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.main,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  // Table Rows for each event
+                                  ...widget.events.map((event) {
+                                    double eventBalance = 0.0;
+                                    if (event.balance.isNotEmpty) {
+                                      List<double> firstUserBalance = mapToDoubleList(event.balance[0]);
+                                      if (firstUserBalance.isNotEmpty) {
+                                        eventBalance = firstUserBalance.reduce((a, b) => a + b);
+                                      }
+                                    }
 
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 32.0),
-            child: widget.events.isEmpty
-                ? Card(
-                    color: AppColors.subAlt,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.receipt_long_outlined, color: AppColors.main.withOpacity(0.7), size: 48),
-                          SizedBox(height: 16),
-                          Text('No transactions recorded yet',
-                              style: TextStyle(color: AppColors.main, fontSize: 18, fontWeight: FontWeight.w500)),
-                          SizedBox(height: 8),
-                          Text('Add expenses in your events to track transactions',
-                              style: TextStyle(color: AppColors.main.withOpacity(0.7), fontSize: 14),
-                              textAlign: TextAlign.center),
-                        ],
-                      ),
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: widget.events.expand((event) => event.expenses ?? []).length,
-                    itemBuilder: (context, index) {
-                      var allExpenses = widget.events.expand((event) => event.expenses ?? []).toList();
-                      final expense = allExpenses[index];
-
-                      return Card(
-                        color: AppColors.subAlt,
-                        child: ListTile(
-                          title: Text(
-                            expense.title, // Expense name
-                            style: TextStyle(color: AppColors.main, fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Text(
-                            '${expense.date} | ${expense.time} | ${expense.amount}',
-                            style: TextStyle(color: AppColors.main.withOpacity(0.7)),
-                          ),
-                          trailing: Text(
-                            'RM ${expense.amount.toStringAsFixed(2)}',
-                            style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+                                    return TableRow(
+                                      children: [
+                                        TableCell(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                            child: Text(
+                                              event.title,
+                                              style: TextStyle(color: AppColors.main),
+                                            ),
+                                          ),
+                                        ),
+                                        TableCell(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                            child: Text(
+                                              event.date,
+                                              style: TextStyle(color: AppColors.main),
+                                            ),
+                                          ),
+                                        ),
+                                        TableCell(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                            child: Text(
+                                              'RM ${eventBalance.toStringAsFixed(2)}',
+                                              style: TextStyle(
+                                                color: eventBalance >= 0 ? Colors.green : Colors.red,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  }).toList(),
+                                ],
+                              ),
+                              // Total Balance Row
+                              Padding(
+                                padding: const EdgeInsets.only(top: 16.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      'Total Balance: ',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.main,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    Text(
+                                      'RM ${totalBalance.toStringAsFixed(2)}',
+                                      style: TextStyle(
+                                        color: totalBalance >= 0 ? Colors.green : Colors.red,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      );
-                    },
+                      ],
+                    ),
                   ),
+                ),
+              ),
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 30),
+
+        // Recent Transactions Section
+        Expanded(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  'Recent Transactions',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.text,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                  child: allExpenses.isEmpty
+                      ? Card(
+                          color: AppColors.subAlt,
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.receipt_long_outlined,
+                                  color: AppColors.main.withOpacity(0.7),
+                                  size: 48,
+                                ),
+                                SizedBox(height: 16),
+                                Text(
+                                  'No transactions recorded yet',
+                                  style: TextStyle(
+                                    color: AppColors.main,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  'Add expenses in your events to track transactions',
+                                  style: TextStyle(
+                                    color: AppColors.main.withOpacity(0.7),
+                                    fontSize: 14,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      : ListView.builder(
+                          itemCount: allExpenses.length,
+                          itemBuilder: (context, index) {
+                            final expense = allExpenses[index];
+                            List<double> splits = mapToDoubleList(expense.split);
+                            double relevantAmount = expense.paidBy == 0
+                                ? expense.amount
+                                : (splits.isNotEmpty ? -splits[0] : 0.0);
+
+                            return Card(
+                              color: AppColors.subAlt,
+                              child: ListTile(
+                                title: Text(
+                                  expense.title,
+                                  style: TextStyle(
+                                    color: AppColors.main,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  '${expense.date} | ${expense.time}',
+                                  style: TextStyle(
+                                    color: AppColors.main.withOpacity(0.7),
+                                  ),
+                                ),
+                                trailing: Text(
+                                  'RM ${relevantAmount.toStringAsFixed(2)}',
+                                  style: TextStyle(
+                                    color: relevantAmount >= 0 ? Colors.green : Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                ),
+              ),
+            ],
           ),
         ),
       ],

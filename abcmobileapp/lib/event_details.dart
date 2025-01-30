@@ -1,8 +1,9 @@
+// ignore_for_file: prefer_interpolation_to_compose_strings
+
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'model.dart';
 import 'package:intl/intl.dart';
-import 'firebase_options.dart';
 import 'currency.dart';
 
 class EventDetailsPage extends StatefulWidget {
@@ -39,6 +40,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     'JPY': '¥'
   };
 
+  List<String> userName = [''];
 
   @override
   void initState() {
@@ -46,7 +48,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     _loadExpenses();
     numberOfUsers = widget.event.userId.length;
     _userIndex = widget.event.userId.indexOf(global_userId);
-    _generateControllers();
+    _generateControllers(); 
+    userName = widget.event.userName!;
   }
 
   void _generateControllers() {
@@ -161,6 +164,31 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     return doubleListListToStringList(balance);
   }
 
+  String printSplit(List<double> split, List<String> userName) {
+    String result = "|";
+    for (var i = 0; i < userName.length; i++) {
+      result += " ${userName[i]} : ${moneyFormat(_currencyAppend, split[i], _exchangeRate)} |";
+    }
+    return result;
+  }
+
+  String printBalance(int userIndex, String splitString, List<String> userName) {
+    if(userName.length == 1) return "";
+    List<double> split = mapToDoubleList(splitString);
+    String result = "|";
+    for (var i = 0; i < split.length; i++) {
+      if(i==userIndex) continue;
+      if(split[i] > 0){
+        result += " ${userName[i]} owes you ${moneyFormat(_currencyAppend, split[i], _exchangeRate)} |";
+      }else if(split[i] < 0){
+        result += " you owe ${userName[i]} ${moneyFormat(_currencyAppend, split[i], _exchangeRate)} |";
+      }else{
+        result += " ~ |";
+      }
+    }
+    return result;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -180,7 +208,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         Text(
           "Total Spent: ${moneyFormat(_currencyAppend, widget.event.totalSpending, _exchangeRate)}\n"+
           "Your spending: ${moneyFormat(_currencyAppend, mapToDoubleList(widget.event.balance[_userIndex])[_userIndex], _exchangeRate)}\n"+
-          "Balance: ${widget.event.balance[_userIndex]}",
+          "${printBalance(_userIndex, widget.event.balance[_userIndex], userName)}",
           style: TextStyle(
               color: Colors.black,
               backgroundColor: const Color.fromARGB(255, 240, 215, 245)),
@@ -194,7 +222,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             String title = _expenses[_expenses.length - 1 - index].title;
             double amount = _expenses[_expenses.length - 1 - index].amount;
             int paidBy = _expenses[_expenses.length - 1 - index].paidBy;
-            String split = _expenses[_expenses.length - 1 - index].split;
+            List<double> split = mapToDoubleList(_expenses[_expenses.length - 1 - index].split);
             String date = _expenses[_expenses.length - 1 - index].date;
             String time = _expenses[_expenses.length - 1 - index].time;
             return Align(
@@ -249,7 +277,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                 color: Colors.white),
                           ),
                           Text(
-                            "Paid By: ${paidBy}",
+                            "Paid By: ${userName[paidBy]}",
                             style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
@@ -262,7 +290,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Split: ${split}",
+                            "${printSplit(split, userName)}",
                             style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
