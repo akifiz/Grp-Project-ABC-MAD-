@@ -77,3 +77,4 @@ Thumbs.db
 #new
 .metadata
 README.md
+pubspec.lock
