@@ -29,9 +29,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   final TextEditingController amountController = TextEditingController();
   final TextEditingController titleController = TextEditingController();
 
-  String currencyString = 'RM';
-  String currency = 'MYR';
-  double exchangeRate = 1;
+  String _currencyString = 'RM';
+  String _currency = 'MYR';
+  double _exchangeRate = 1;
 
   @override
   void initState() {
@@ -85,14 +85,18 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     }
   }
 
-  Future<void> _loadExchangeRate(String currency)async{
+  Future<void> _loadExchangeRate(String currency, String currencyString)async{
     if(currency=='MYR'){
-      exchangeRate = 1;
+      _exchangeRate = 1;
       return;
     }
     try{
       final String fromCurrency = 'MYR';
-      exchangeRate = await getExchangeRate(fromCurrency, currency);
+      _exchangeRate = await getExchangeRate(fromCurrency, currency);
+      setState((){
+        _currency = 'USD';
+        _currencyString = 'US\$';
+      });
     }catch(e){
       print("Failed to load exchange rate");
     }
@@ -149,17 +153,15 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               tooltip: 'Change Currency',
               onPressed: () {
                 setState(() {
-                  currency = 'USD';
-                  currencyString = 'US\$';
+                  _loadExchangeRate("USD", 'US\$');
                 });
-                _loadExchangeRate(currency);
               },
             ),
           ]),
       body: Column(children: [
         Text(
-          "Total Spent: ${moneyFormat(currencyString, widget.event.totalSpending, exchangeRate)}\n"+
-          "Your spending: ${moneyFormat(currencyString, mapToDoubleList(widget.event.balance[_userIndex])[_userIndex], exchangeRate)}\n"+
+          "Total Spent: ${moneyFormat(_currencyString, widget.event.totalSpending, _exchangeRate)}\n"+
+          "Your spending: ${moneyFormat(_currencyString, mapToDoubleList(widget.event.balance[_userIndex])[_userIndex], _exchangeRate)}\n"+
           "Balance: ${widget.event.balance[_userIndex]}",
           style: TextStyle(
               color: Colors.black,
@@ -222,7 +224,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Amount: ${moneyFormat(currencyString, amount, exchangeRate)}",
+                            "Amount: ${moneyFormat(_currencyString, amount, _exchangeRate)}",
                             style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
