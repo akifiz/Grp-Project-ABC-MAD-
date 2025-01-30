@@ -48,7 +48,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     _loadExpenses();
     numberOfUsers = widget.event.userId.length;
     _userIndex = widget.event.userId.indexOf(global_userId);
-    _generateControllers(); 
+    _generateControllers();
     userName = widget.event.userName!;
   }
 
@@ -114,15 +114,15 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     }
   }
 
-  Future<void> _loadExchangeRate(String currency, String currencyAppend)async{
-    try{
+  Future<void> _loadExchangeRate(String currency, String currencyAppend) async {
+    try {
       final String fromCurrency = 'MYR';
       _exchangeRate = await getExchangeRate(fromCurrency, currency);
-      setState((){
+      setState(() {
         _currency = currency;
         _currencyAppend = currencyAppend;
       });
-    }catch(e){
+    } catch (e) {
       print("Failed to load exchange rate");
     }
   }
@@ -144,7 +144,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   }
 
   List<String> calculateBalance(
-    List<String> originalBalance, Expense newExpense) {
+      List<String> originalBalance, Expense newExpense) {
     List<List<double>> balance = mapToDoubleListList(originalBalance);
     List<double> costSplit = mapToDoubleList(newExpense.split);
     int payerIndex = newExpense.paidBy;
@@ -167,23 +167,26 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   String printSplit(List<double> split, List<String> userName) {
     String result = "|";
     for (var i = 0; i < userName.length; i++) {
-      result += " ${userName[i]} : ${moneyFormat(_currencyAppend, split[i], _exchangeRate)} |";
+      result +=
+          " ${userName[i]} : ${moneyFormat(_currencyAppend, split[i], _exchangeRate)} |";
     }
     return result;
   }
 
-
-  String printBalance(int userIndex, String splitString, List<String> userName) {
-    if(userName.length == 1) return "";
+  String printBalance(
+      int userIndex, String splitString, List<String> userName) {
+    if (userName.length == 1) return "";
     List<double> split = mapToDoubleList(splitString);
     String result = "|";
     for (var i = 0; i < split.length; i++) {
-      if(i==userIndex) continue;
-      if(split[i] > 0){
-        result += " ${userName[i]} owes you ${moneyFormat(_currencyAppend, split[i], _exchangeRate)} |";
-      }else if(split[i] < 0){
-        result += " you owe ${userName[i]} ${moneyFormat(_currencyAppend, split[i], _exchangeRate)} |";
-      }else{
+      if (i == userIndex) continue;
+      if (split[i] > 0) {
+        result +=
+            " ${userName[i]} owes you ${moneyFormat(_currencyAppend, split[i], _exchangeRate)} |";
+      } else if (split[i] < 0) {
+        result +=
+            " you owe ${userName[i]} ${moneyFormat(_currencyAppend, split[i], _exchangeRate)} |";
+      } else {
         result += " ~ |";
       }
     }
@@ -206,7 +209,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             ),
           ]),
       body: Column(children: [
-Container(
+        Container(
           margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
           padding: EdgeInsets.all(16.0),
           decoration: BoxDecoration(
@@ -245,7 +248,6 @@ Container(
           ),
         ),
         const Divider(height: 1, thickness: 1, color: Colors.grey),
-
         Expanded(
             child: ListView.builder(
           reverse: true, // Messages start from the bottom
@@ -254,7 +256,8 @@ Container(
             String title = _expenses[_expenses.length - 1 - index].title;
             double amount = _expenses[_expenses.length - 1 - index].amount;
             int paidBy = _expenses[_expenses.length - 1 - index].paidBy;
-            List<double> split = mapToDoubleList(_expenses[_expenses.length - 1 - index].split);
+            List<double> split =
+                mapToDoubleList(_expenses[_expenses.length - 1 - index].split);
             String date = _expenses[_expenses.length - 1 - index].date;
             String time = _expenses[_expenses.length - 1 - index].time;
             List<String> userName = widget.event.userName ?? [''];
@@ -343,253 +346,241 @@ Container(
                 ));
           },
         )),
+        Container(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Center(
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+              ElevatedButton(
+                onPressed: () {
+                  //TODO: add settlement, expenses that balances out debts, does not count towards spending
+                },
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text("Pay Balance"),
+              ),
+              const SizedBox(width: 12),
+              ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text("Add an Expense"),
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          String? splitErrorMessage;
+                          String? titleErrorMessage;
+                          return StatefulBuilder(builder: (context, setState) {
+                            bool _validateSplit() {
+                              double totalCost = costControllers.fold(
+                                  0.0,
+                                  (sum, controller) =>
+                                      sum +
+                                      (double.tryParse(controller.text) ??
+                                          0.0));
+                              if (totalCost != amount) {
+                                setState(() {
+                                  splitErrorMessage =
+                                      'Total cost split must add up to the amount';
+                                });
+                                return false;
+                              }
+                              setState(() {
+                                splitErrorMessage = null;
+                              });
+                              return true;
+                            }
 
-Container(
-  padding: const EdgeInsets.symmetric(vertical: 12),
-  child: Center(
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        ElevatedButton(
-          onPressed: () {
-            
-          },
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          child: const Text("Pay Balance"),
-        ),
-        const SizedBox(width: 12),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          child: const Text("Add an Expense"),
-                      onPressed: () {
-                        showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              String? splitErrorMessage;
-                              String? titleErrorMessage;
-                              return StatefulBuilder(
-                                  builder: (context, setState) {
-                                bool _validateSplit() {
-                                  double totalCost = costControllers.fold(
-                                      0.0,
-                                      (sum, controller) =>
-                                          sum +
-                                          (double.tryParse(controller.text) ??
-                                              0.0));
-                                  if (totalCost != amount) {
-                                    setState(() {
-                                      splitErrorMessage =
-                                          'Total cost split must add up to the amount';
-                                    });
-                                    return false;
-                                  }
-                                  setState(() {
-                                    splitErrorMessage = null;
-                                  });
-                                  return true;
-                                }
+                            bool _validateTitle() {
+                              if (titleController.text == '') {
+                                setState(() {
+                                  titleErrorMessage =
+                                      'Expense title cannot be empty';
+                                });
+                                return false;
+                              }
+                              setState(() {
+                                titleErrorMessage = null;
+                              });
+                              return true;
+                            }
 
-                                bool _validateTitle() {
-                                  if (titleController.text == '') {
-                                    setState(() {
-                                      titleErrorMessage =
-                                          'Expense title cannot be empty';
-                                    });
-                                    return false;
-                                  }
-                                  setState(() {
-                                    titleErrorMessage = null;
-                                  });
-                                  return true;
-                                }
-
-                                return AlertDialog(
-                                  title: const Text('Add Expense'),
-                                  content: SizedBox(
-                                    width: double.maxFinite,
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                            return AlertDialog(
+                              title: const Text('Add Expense'),
+                              content: SizedBox(
+                                width: double.maxFinite,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TextField(
+                                      keyboardType: TextInputType.text,
+                                      decoration: const InputDecoration(
+                                          labelText: 'Title'),
+                                      controller: titleController,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    if (titleErrorMessage != null)
+                                      Text(
+                                        titleErrorMessage!,
+                                        style:
+                                            const TextStyle(color: Colors.red),
+                                      ),
+                                    const SizedBox(height: 8),
+                                    TextField(
+                                        keyboardType: TextInputType.number,
+                                        decoration: const InputDecoration(
+                                            labelText: 'Amount'),
+                                        controller: amountController,
+                                        onChanged: (value) {
+                                          double? parsedValue =
+                                              double.tryParse(value);
+                                          if (parsedValue != null &&
+                                              parsedValue >= 0) {
+                                            setState(() {
+                                              amount = parsedValue;
+                                              _updateCostSplit();
+                                            });
+                                          } else {
+                                            amountController.text =
+                                                ''; // Reset to zero if input is negative
+                                            amountController.selection =
+                                                TextSelection.fromPosition(
+                                              TextPosition(
+                                                  offset: amountController
+                                                      .text.length),
+                                            );
+                                          }
+                                        }),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
-                                        TextField(
-                                          keyboardType: TextInputType.text,
-                                          decoration: const InputDecoration(
-                                              labelText: 'Title'),
-                                          controller: titleController,
-                                        ),
-                                        const SizedBox(height: 8),
-                                        if (titleErrorMessage != null)
-                                          Text(
-                                            titleErrorMessage!,
-                                            style: const TextStyle(
-                                                color: Colors.red),
-                                          ),
-                                        const SizedBox(height: 8),
-                                        TextField(
-                                            keyboardType: TextInputType.number,
-                                            decoration: const InputDecoration(
-                                                labelText: 'Amount'),
-                                            controller: amountController,
-                                            onChanged: (value) {
-                                              double? parsedValue =
-                                                  double.tryParse(value);
-                                              if (parsedValue != null &&
-                                                  parsedValue >= 0) {
-                                                setState(() {
-                                                  amount = parsedValue;
-                                                  _updateCostSplit();
-                                                });
-                                              } else {
-                                                amountController.text =
-                                                    ''; // Reset to zero if input is negative
-                                                amountController.selection =
-                                                    TextSelection.fromPosition(
-                                                  TextPosition(
-                                                      offset: amountController
-                                                          .text.length),
-                                                );
-                                              }
-                                            }),
-                                        const SizedBox(height: 8),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            const Text('Cost Split:'),
-                                            ToggleButtons(
-                                              isSelected: [
-                                                isEvenSplit,
-                                                !isEvenSplit
-                                              ],
-                                              onPressed: (index) {
-                                                setState(() {
-                                                  isEvenSplit = index == 0;
-                                                  print(
-                                                      "isEventSplit=$isEvenSplit");
-                                                  _updateCostSplit();
-                                                });
-                                              },
-                                              children: const [
-                                                Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 16.0),
-                                                  child: Text('Even'),
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 16.0),
-                                                  child: Text('Custom'),
-                                                ),
-                                              ],
+                                        const Text('Cost Split:'),
+                                        ToggleButtons(
+                                          isSelected: [
+                                            isEvenSplit,
+                                            !isEvenSplit
+                                          ],
+                                          onPressed: (index) {
+                                            setState(() {
+                                              isEvenSplit = index == 0;
+                                              print(
+                                                  "isEventSplit=$isEvenSplit");
+                                              _updateCostSplit();
+                                            });
+                                          },
+                                          children: const [
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 16.0),
+                                              child: Text('Even'),
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 16.0),
+                                              child: Text('Custom'),
                                             ),
                                           ],
                                         ),
-                                        const SizedBox(height: 8),
-                                        if (splitErrorMessage != null)
-                                          Text(
-                                            splitErrorMessage!,
-                                            style: const TextStyle(
-                                                color: Colors.red),
-                                          ),
-                                        const SizedBox(height: 8),
-                                        SizedBox(
-                                          height: 200,
-                                          child: ListView.builder(
-                                            itemCount: numberOfUsers,
-                                            itemBuilder: (context, index) {
-                                              return Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 8.0),
-                                                child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: Text(widget
-                                                          .event.userName![index]),
-                                                    ),
-                                                    const SizedBox(width: 8),
-                                                    Expanded(
-                                                      child: TextField(
-                                                        controller:
-                                                            costControllers[
-                                                                index],
-                                                        keyboardType:
-                                                            TextInputType
-                                                                .number,
-                                                        decoration:
-                                                            const InputDecoration(
-                                                                labelText:
-                                                                    'Cost'),
-                                                        enabled: !isEvenSplit,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ),
                                       ],
                                     ),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.of(context).pop(),
-                                      child: const Text('Cancel'),
-                                    ),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        if (_validateSplit() &&
-                                            _validateTitle()) {
-                                          List<double> costValues =
-                                              costControllers
-                                                  .map((controller) =>
-                                                      double.tryParse(
-                                                          controller.text) ??
-                                                      0.0)
-                                                  .toList();
-
-                                          _addExpense(new Expense(
-                                            id: "EXP${_expenses.length + 1}",
-                                            title: titleController.text,
-                                            amount: double.tryParse(
-                                                    amountController.text) ??
-                                                0.0,
-                                            paidBy: _userIndex,
-                                            split:
-                                                doubleListToString(costValues),
-                                            date: DateFormat('d MMMM yyyy')
-                                                .format(DateTime.now()),
-                                            time: DateFormat('h:mm a')
-                                                .format(DateTime.now()),
-                                          ));
-                                          titleController.clear();
-                                          amountController.clear();
-                                          Navigator.of(context).pop();
-                                        }
-                                      },
-                                      child: const Text('Submit'),
+                                    const SizedBox(height: 8),
+                                    if (splitErrorMessage != null)
+                                      Text(
+                                        splitErrorMessage!,
+                                        style:
+                                            const TextStyle(color: Colors.red),
+                                      ),
+                                    const SizedBox(height: 8),
+                                    SizedBox(
+                                      height: 200,
+                                      child: ListView.builder(
+                                        itemCount: numberOfUsers,
+                                        itemBuilder: (context, index) {
+                                          return Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 8.0),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(widget
+                                                      .event.userName![index]),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Expanded(
+                                                  child: TextField(
+                                                    controller:
+                                                        costControllers[index],
+                                                    keyboardType:
+                                                        TextInputType.number,
+                                                    decoration:
+                                                        const InputDecoration(
+                                                            labelText: 'Cost'),
+                                                    enabled: !isEvenSplit,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      ),
                                     ),
                                   ],
-                                );
-                              });
-                            });
-                      }),
-                ])))
+                                ),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: const Text('Cancel'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    if (_validateSplit() && _validateTitle()) {
+                                      List<double> costValues = costControllers
+                                          .map((controller) =>
+                                              double.tryParse(
+                                                  controller.text) ??
+                                              0.0)
+                                          .toList();
+
+                                      _addExpense(new Expense(
+                                        id: "EXP${_expenses.length + 1}",
+                                        title: titleController.text,
+                                        amount: double.tryParse(
+                                                amountController.text) ??
+                                            0.0,
+                                        paidBy: _userIndex,
+                                        split: doubleListToString(costValues),
+                                        date: DateFormat('d MMMM yyyy')
+                                            .format(DateTime.now()),
+                                        time: DateFormat('h:mm a')
+                                            .format(DateTime.now()),
+                                      ));
+                                      titleController.clear();
+                                      amountController.clear();
+                                      Navigator.of(context).pop();
+                                    }
+                                  },
+                                  child: const Text('Submit'),
+                                ),
+                              ],
+                            );
+                          });
+                        });
+                  }),
+            ])))
       ]),
     );
   }
 }
-
