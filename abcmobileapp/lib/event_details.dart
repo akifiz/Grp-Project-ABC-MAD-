@@ -161,6 +161,14 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     return doubleListListToStringList(balance);
   }
 
+  String printSplit(List<double> split, List<String> userName) {
+    String result = "|";
+    for (var i = 0; i < userName.length; i++) {
+      result += " ${userName[i]} : ${moneyFormat(_currencyAppend, split[i], _exchangeRate)} |";
+    }
+    return result;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -194,9 +202,10 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             String title = _expenses[_expenses.length - 1 - index].title;
             double amount = _expenses[_expenses.length - 1 - index].amount;
             int paidBy = _expenses[_expenses.length - 1 - index].paidBy;
-            String split = _expenses[_expenses.length - 1 - index].split;
+            List<double> split = mapToDoubleList(_expenses[_expenses.length - 1 - index].split);
             String date = _expenses[_expenses.length - 1 - index].date;
             String time = _expenses[_expenses.length - 1 - index].time;
+            List<String> userName = widget.event.userName ?? [''];
             return Align(
                 alignment: Alignment.center,
                 child: Container(
@@ -249,7 +258,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                 color: Colors.white),
                           ),
                           Text(
-                            "Paid By: ${paidBy}",
+                            "Paid By: ${userName[paidBy]}",
                             style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
@@ -262,7 +271,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Split: ${split}",
+                            "${printSplit(split, userName)}",
                             style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,

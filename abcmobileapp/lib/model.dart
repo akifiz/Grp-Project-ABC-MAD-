@@ -2,31 +2,31 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:core';
 
-final String global_userId = "U1";
-String global_userName = "";
+String global_userId = "U1";
+String global_defaultName = "You";
 
 String generateUuid(){
   var uuid = Uuid();
   return uuid.v4();
 }
 
-class User {
+class UserData {
   final String userId;
   final String defaultName;
   final List<String> eventId;
 
-  User({
+  UserData({
     required this.userId,
     required this.defaultName,
     required this.eventId,
   });
 
-  factory User.fromFirestore(DocumentSnapshot doc) {
+  factory UserData.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-    return User(
+    return UserData(
       userId: data['userId'] ?? '',
       defaultName: data['defaultName'],
-      eventId: List<String>.from(data['eventId'] ?? []),
+      eventId: List<String>.from(data['eventId']),
     );
   }
 }
@@ -105,6 +105,18 @@ class Expense {
 class FirebaseHandler {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  Future<void> createUserData(String userId, String defaultName)async {
+    try{
+      await _firestore.collection('USERS').doc(userId).set({
+      'userId': userId,
+      'defaultName': defaultName,
+      'eventId': [''],
+    });
+    }catch(e){
+      print('Error creating user');
+    }
+  }
+
   // Fetch all expenses from the "expenses" collection of event id
 Future<List<Event>> fetchEvents(List<String> eventList) async {
   try {
@@ -160,11 +172,11 @@ Future<List<Expense>> fetchExpenses(String eventId) async {
 }
 
 
-  Future<User> fetchUserData(String userId) async {
+  Future<UserData> fetchUserData(String userId) async {
     try {
       DocumentSnapshot doc =
         await _firestore.collection('USERS').doc(userId).get();
-      return User.fromFirestore(doc);
+      return UserData.fromFirestore(doc);
     } catch (e) {
       print('Error fetching user data: $e');
     }
@@ -306,3 +318,5 @@ List<double> addDoubleLists(List<double> list1, List<double> list2) {
   int minLength = list1.length < list2.length ? list1.length : list2.length;
   return List.generate(minLength, (i) => list1[i] + list2[i]);
 }
+
+
