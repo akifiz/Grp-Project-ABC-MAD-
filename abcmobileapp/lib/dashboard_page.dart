@@ -55,6 +55,7 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     final totalBalance = _calculateTotalBalance();
     final allExpenses = _getAllExpenses();
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -88,137 +89,155 @@ class _DashboardPageState extends State<DashboardPage> {
         ),
         const SizedBox(height: 10),
 
+        // Updated table container with improved scrolling and centering
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Card(
-            color: AppColors.subAlt,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Table Header
-                    Table(
-                      defaultColumnWidth: const IntrinsicColumnWidth(),
+          alignment: Alignment.center, // Center the content horizontally
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: screenWidth > 800 ? 800 : screenWidth - 32, // Limit max width while staying responsive
+            ),
+            child: Card(
+              color: AppColors.subAlt,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.4, // Maximum height (40% of screen height)
+                ),
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
                       children: [
-                        TableRow(
-                          decoration: BoxDecoration(
-                            border: Border(bottom: BorderSide(color: AppColors.main.withOpacity(0.2))),
-                          ),
-                          children: [
-                            TableCell(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                                child: Text(
-                                  'EVENT',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.main,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            TableCell(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                                child: Text(
-                                  'DATE',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.main,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            TableCell(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                                child: Text(
-                                  'AMOUNT',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.main,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        // Table Rows for each event
-                        ...widget.events.map((event) {
-                          double eventBalance = 0.0;
-                          if (event.balance.isNotEmpty) {
-                            List<double> firstUserBalance = mapToDoubleList(event.balance[0]);
-                            if (firstUserBalance.isNotEmpty) {
-                              eventBalance = firstUserBalance.reduce((a, b) => a + b);
-                            }
-                          }
-
-                          return TableRow(
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              TableCell(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                                  child: Text(
-                                    event.title,
-                                    style: TextStyle(color: AppColors.main),
-                                  ),
-                                ),
-                              ),
-                              TableCell(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                                  child: Text(
-                                    event.date,
-                                    style: TextStyle(color: AppColors.main),
-                                  ),
-                                ),
-                              ),
-                              TableCell(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                                  child: Text(
-                                    'RM ${eventBalance.toStringAsFixed(2)}',
-                                    style: TextStyle(
-                                      color: eventBalance >= 0 ? Colors.green : Colors.red,
-                                      fontWeight: FontWeight.bold,
+                              // Table Header
+                              Table(
+                                defaultColumnWidth: const IntrinsicColumnWidth(),
+                                children: [
+                                  TableRow(
+                                    decoration: BoxDecoration(
+                                      border: Border(bottom: BorderSide(color: AppColors.main.withOpacity(0.2))),
                                     ),
+                                    children: [
+                                      TableCell(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                          child: Text(
+                                            'EVENT',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.main,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      TableCell(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                          child: Text(
+                                            'DATE',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.main,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      TableCell(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                          child: Text(
+                                            'AMOUNT',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.main,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
+                                  // Table Rows for each event
+                                  ...widget.events.map((event) {
+                                    double eventBalance = 0.0;
+                                    if (event.balance.isNotEmpty) {
+                                      List<double> firstUserBalance = mapToDoubleList(event.balance[0]);
+                                      if (firstUserBalance.isNotEmpty) {
+                                        eventBalance = firstUserBalance.reduce((a, b) => a + b);
+                                      }
+                                    }
+
+                                    return TableRow(
+                                      children: [
+                                        TableCell(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                            child: Text(
+                                              event.title,
+                                              style: TextStyle(color: AppColors.main),
+                                            ),
+                                          ),
+                                        ),
+                                        TableCell(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                            child: Text(
+                                              event.date,
+                                              style: TextStyle(color: AppColors.main),
+                                            ),
+                                          ),
+                                        ),
+                                        TableCell(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                            child: Text(
+                                              'RM ${eventBalance.toStringAsFixed(2)}',
+                                              style: TextStyle(
+                                                color: eventBalance >= 0 ? Colors.green : Colors.red,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  }).toList(),
+                                ],
+                              ),
+                              // Total Balance Row
+                              Padding(
+                                padding: const EdgeInsets.only(top: 16.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      'Total Balance: ',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.main,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    Text(
+                                      'RM ${totalBalance.toStringAsFixed(2)}',
+                                      style: TextStyle(
+                                        color: totalBalance >= 0 ? Colors.green : Colors.red,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
-                          );
-                        }).toList(),
+                          ),
+                        ),
                       ],
                     ),
-                    // Total Balance Row
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            'Total Balance: ',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.main,
-                              fontSize: 16,
-                            ),
-                          ),
-                          Text(
-                            'RM ${totalBalance.toStringAsFixed(2)}',
-                            style: TextStyle(
-                              color: totalBalance >= 0 ? Colors.green : Colors.red,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
