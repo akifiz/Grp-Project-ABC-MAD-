@@ -17,7 +17,6 @@ void main() async {
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-  bool isSignedUp = prefs.getBool('isSignedUp') ?? false;
 
   Widget homePage;
   if (isLoggedIn) {
@@ -62,7 +61,7 @@ class _MainAppState extends State<MainApp> {
   int _currentIndex = 1;
   final PageController _pageController = PageController(initialPage: 1);
   List<Event> _events = [];
-  User? _userData;
+  UserData? _userData;
   
   void _fetchUpdatedEvents() {
     if (_userData == null) return; 
@@ -89,13 +88,13 @@ class _MainAppState extends State<MainApp> {
   Future<void> _loadUserData() async {
     try {
       final handler = FirebaseHandler();
-      User userData = await handler.fetchUserData(global_userId);
+      UserData userData = await handler.fetchUserData(global_userId);
       List<Event> userEvents = await handler.fetchEvents(userData.eventId);
-      global_userName = userData.defaultName;
 
       setState(() {
         _userData = userData;
         _events = userEvents;
+        global_defaultName = userData.defaultName;
       });
     } catch(e) {
       print('Error loading user data $e');
