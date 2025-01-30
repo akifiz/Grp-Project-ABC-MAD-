@@ -20,15 +20,14 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   Map<String, double> _calculateBalances() {
     final Map<String, double> balances = {};
-    const String user1Id = "U1"; 
 
     for (var event in widget.events) { // ✅ Use widget.events inside StatefulWidget
-      if (event.userId.contains(user1Id) && event.expenses != null) {
+      if (event.userId.contains(global_userId) && event.expenses != null) {
         for (var expense in event.expenses!) {
-          if (expense.paidBy == user1Id) {
-            balances[user1Id] = (balances[user1Id] ?? 0) + expense.amount;
+          if (expense.paidBy == global_userId) {
+            balances[global_userId] = (balances[global_userId] ?? 0) + expense.amount;
           } else {
-            balances[user1Id] = (balances[user1Id] ?? 0) - (expense.amount / event.userId.length);
+            balances[global_userId] = (balances[global_userId] ?? 0) - (expense.amount / event.userId.length);
           }
         }
       }

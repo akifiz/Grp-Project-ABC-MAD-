@@ -7,6 +7,7 @@ import 'model.dart';
 import 'tilebutton.dart';
 import 'package:intl/intl.dart';
 
+
 class EventsPage extends StatefulWidget {
   final List<Event> events;
   final Function() onEventUpdated;
@@ -181,7 +182,7 @@ class _EventsPageState extends State<EventsPage> {
                       }
 
                       _addEvent(new Event(
-                        eventId: "E${widget.events.length + 1}",
+                        eventId: "${generateUuid()}",
                         title: titleController.text,
                         totalSpending: 0.0,
                         balance: initialBalances,

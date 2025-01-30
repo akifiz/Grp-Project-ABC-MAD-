@@ -70,8 +70,9 @@ class _MainAppState extends State<MainApp> {
   Future<void> _loadUserData() async {
     try {
       final handler = FirebaseHandler();
-      User userData = await handler.fetchUserData(userId);
+      User userData = await handler.fetchUserData(global_userId);
       List<Event> userEvents = await handler.fetchEvents(userData.eventId);
+      global_userName = userData.defaultName;
 
       setState(() {
         _userData = userData;
