@@ -38,12 +38,23 @@ class MainApp extends StatefulWidget {
   _MainAppState createState() => _MainAppState();
 }
 
+
 class _MainAppState extends State<MainApp> {
   int _currentIndex = 1;
   final PageController _pageController = PageController(initialPage: 1);
   List<Event> _events = [];
   User? _userData;
   
+  void _fetchUpdatedEvents() {
+    if (_userData == null) return; 
+    FirebaseHandler().fetchEvents(_userData!.eventId).then((updatedEvents) {
+      setState(() {
+        _events = updatedEvents;
+      });
+    });
+  }
+
+
   @override
   void initState() {
     super.initState();
@@ -92,6 +103,7 @@ class _MainAppState extends State<MainApp> {
             onTabTapped: _onTabTapped,
             child: DashboardPage(
               events: _events,
+              onEventUpdated: _fetchUpdatedEvents, 
             ),
           ),
           BaseLayout(
