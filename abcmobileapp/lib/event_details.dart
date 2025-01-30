@@ -45,7 +45,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     super.initState();
     _loadExpenses();
     numberOfUsers = widget.event.userId.length;
-    _userIndex = widget.event.userId.indexOf(userId);
+    _userIndex = widget.event.userId.indexOf(global_userId);
     _generateControllers();
   }
 

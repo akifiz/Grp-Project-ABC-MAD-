@@ -1,3 +1,4 @@
+import 'package:abcmobileapp/model.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'app_colors.dart';
@@ -67,6 +68,12 @@ class _SettingsPageState extends State<SettingsPage> {
                 style: TextStyle(color: AppColors.main, fontSize: 16, fontStyle: FontStyle.italic),
                 textAlign: TextAlign.center,
               ),
+              SizedBox(height: 20),
+              Text(
+                "userId:"+global_userId,
+                style: TextStyle(color: AppColors.main, fontSize: 16, fontStyle: FontStyle.italic),
+                textAlign: TextAlign.center,
+              ),
             ],
           ),
           actions: [
@@ -110,6 +117,18 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
         const SizedBox(height: 20),
 
+        Padding(
+          padding: const EdgeInsets.only(top: 16.0),
+          child: Text(
+            'Hi, ' + global_userName,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
         // Currency Selection Section
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
