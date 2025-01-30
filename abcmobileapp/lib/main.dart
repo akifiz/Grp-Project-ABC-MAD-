@@ -59,9 +59,9 @@ class _MainAppState extends State<MainApp> {
   Future<void> _loadUserData() async {
     try {
       final handler = FirebaseHandler();
-      User _userData = await handler.fetchUserData(userId);
+      User userData = await handler.fetchUserData(userId);
 
-      List<Event> userEvents = await handler.fetchEvents(_userData.eventId);
+      List<Event> userEvents = await handler.fetchEvents(userData.eventId);
       setState(() {
         _events = userEvents;
       });
@@ -69,18 +69,6 @@ class _MainAppState extends State<MainApp> {
       print('Error loading user data $e');
     }
   }
-
-
-
-  // void _updateEvent(Event event) {
-  //   // final index = events.indexWhere((e) => e.id == event.id);
-  //   // if (index != -1) {
-  //   //   setState(() {
-  //   //     events[index] = event;
-  //   //   });
-  //   //   _saveEvents();
-  //   // }
-  // }
 
   @override
   Widget build(BuildContext context) {
