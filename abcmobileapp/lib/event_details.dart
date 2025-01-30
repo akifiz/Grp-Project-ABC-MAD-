@@ -206,15 +206,45 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             ),
           ]),
       body: Column(children: [
-        Text(
-          "Total Spent: ${moneyFormat(_currencyAppend, widget.event.totalSpending, _exchangeRate)}\n"+
-          "Your spending: ${moneyFormat(_currencyAppend, mapToDoubleList(widget.event.balance[_userIndex])[_userIndex], _exchangeRate)}\n"+
-          "${printBalance(_userIndex, widget.event.balance[_userIndex], userName)}",
-          style: TextStyle(
-              color: Colors.black,
-              backgroundColor: const Color.fromARGB(255, 240, 215, 245)),
+Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 240, 215, 245),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Total Spent: ${moneyFormat(_currencyAppend, widget.event.totalSpending, _exchangeRate)}",
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                "Your Spending: ${moneyFormat(_currencyAppend, mapToDoubleList(widget.event.balance[_userIndex])[_userIndex], _exchangeRate)}",
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                "${printBalance(_userIndex, widget.event.balance[_userIndex], userName)}",
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontStyle: FontStyle.italic,
+                  color: Colors.black54,
+                ),
+              ),
+            ],
+          ),
         ),
-        Divider(height: 1),
+        const Divider(height: 1, thickness: 1, color: Colors.grey),
+
         Expanded(
             child: ListView.builder(
           reverse: true, // Messages start from the bottom
