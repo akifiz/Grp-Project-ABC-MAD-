@@ -168,12 +168,19 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                             builder: (BuildContext context) {
                               String? splitErrorMessage;
                               String? titleErrorMessage;
-                              return StatefulBuilder(builder: (context,setState){   
-                                  bool _validateSplit() {
-                                  double totalCost = costControllers.fold( 0.0,(sum, controller) => sum +(double.tryParse(controller.text) ?? 0.0));
+                              return StatefulBuilder(
+                                  builder: (context, setState) {
+                                bool _validateSplit() {
+                                  double totalCost = costControllers.fold(
+                                      0.0,
+                                      (sum, controller) =>
+                                          sum +
+                                          (double.tryParse(controller.text) ??
+                                              0.0));
                                   if (totalCost != amount) {
                                     setState(() {
-                                      splitErrorMessage = 'Total cost split must add up to the amount';
+                                      splitErrorMessage =
+                                          'Total cost split must add up to the amount';
                                     });
                                     return false;
                                   }
@@ -183,10 +190,11 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                   return true;
                                 }
 
-                                bool _validateTitle(){
-                                  if(titleController.text == ''){
+                                bool _validateTitle() {
+                                  if (titleController.text == '') {
                                     setState(() {
-                                      titleErrorMessage = 'Expense title cannot be empty';
+                                      titleErrorMessage =
+                                          'Expense title cannot be empty';
                                     });
                                     return false;
                                   }
@@ -195,6 +203,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                   });
                                   return true;
                                 }
+
                                 return AlertDialog(
                                   title: const Text('Add Expense'),
                                   content: SizedBox(
@@ -219,25 +228,30 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                           ),
                                         const SizedBox(height: 8),
                                         TextField(
-                                          keyboardType: TextInputType.number,
-                                          decoration: const InputDecoration(
-                                              labelText: 'Amount'),
-                                          controller: amountController,
-                                          onChanged: (value) {
-                                            double? parsedValue = double.tryParse(value);
-                                            if (parsedValue != null && parsedValue >= 0) {
-                                              setState(() {
-                                                amount = parsedValue;
-                                                _updateCostSplit();
-                                              });
-                                            } else {
-                                              amountController.text = ''; // Reset to zero if input is negative
-                                              amountController.selection = TextSelection.fromPosition(
-                                                TextPosition(offset: amountController.text.length),
-                                              );
-                                            } 
-                                          }
-                                        ),
+                                            keyboardType: TextInputType.number,
+                                            decoration: const InputDecoration(
+                                                labelText: 'Amount'),
+                                            controller: amountController,
+                                            onChanged: (value) {
+                                              double? parsedValue =
+                                                  double.tryParse(value);
+                                              if (parsedValue != null &&
+                                                  parsedValue >= 0) {
+                                                setState(() {
+                                                  amount = parsedValue;
+                                                  _updateCostSplit();
+                                                });
+                                              } else {
+                                                amountController.text =
+                                                    ''; // Reset to zero if input is negative
+                                                amountController.selection =
+                                                    TextSelection.fromPosition(
+                                                  TextPosition(
+                                                      offset: amountController
+                                                          .text.length),
+                                                );
+                                              }
+                                            }),
                                         const SizedBox(height: 8),
                                         Row(
                                           mainAxisAlignment:
@@ -274,7 +288,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                         if (splitErrorMessage != null)
                                           Text(
                                             splitErrorMessage!,
-                                            style: const TextStyle(color: Colors.red),
+                                            style: const TextStyle(
+                                                color: Colors.red),
                                           ),
                                         const SizedBox(height: 8),
                                         SizedBox(
@@ -295,9 +310,16 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                                     const SizedBox(width: 8),
                                                     Expanded(
                                                       child: TextField(
-                                                        controller:costControllers[index],
-                                                        keyboardType: TextInputType.number,
-                                                        decoration: const InputDecoration(labelText:'Cost'),
+                                                        controller:
+                                                            costControllers[
+                                                                index],
+                                                        keyboardType:
+                                                            TextInputType
+                                                                .number,
+                                                        decoration:
+                                                            const InputDecoration(
+                                                                labelText:
+                                                                    'Cost'),
                                                         enabled: !isEvenSplit,
                                                       ),
                                                     ),
@@ -318,9 +340,14 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                     ),
                                     ElevatedButton(
                                       onPressed: () {
-                                        if (_validateSplit() && _validateTitle()) {
-                                          List<double> costValues = costControllers
-                                                  .map((controller) =>double.tryParse(controller.text) ?? 0.0)
+                                        if (_validateSplit() &&
+                                            _validateTitle()) {
+                                          List<double> costValues =
+                                              costControllers
+                                                  .map((controller) =>
+                                                      double.tryParse(
+                                                          controller.text) ??
+                                                      0.0)
                                                   .toList();
 
                                           _addExpense(new Expense(
@@ -339,14 +366,12 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                           ));
                                           Navigator.of(context).pop();
                                         }
-
                                       },
                                       child: const Text('Submit'),
                                     ),
                                   ],
                                 );
                               });
-                            
                             });
                       }),
                 ])))
