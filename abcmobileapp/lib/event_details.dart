@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 import 'firebase_options.dart';
 import 'currency.dart';
 
-
 class EventDetailsPage extends StatefulWidget {
   final User userData;
   final Event event;
