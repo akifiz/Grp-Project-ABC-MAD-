@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:core';
 
-final String userId = "U1";
+final String global_userId = "U1";
+String global_userName = "";
 
 class User {
   final String userId;
