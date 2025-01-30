@@ -207,7 +207,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           ]),
       body: Column(children: [
 Container(
-          padding: const EdgeInsets.all(12),
+          margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+          padding: EdgeInsets.all(16.0),
           decoration: BoxDecoration(
             color: const Color.fromARGB(255, 240, 215, 245),
             borderRadius: BorderRadius.circular(10),
@@ -342,7 +343,6 @@ Container(
                 ));
           },
         )),
-   const Divider(height: 1, thickness: 1, color: Colors.grey),
 
 Container(
   padding: const EdgeInsets.symmetric(vertical: 12),
@@ -516,7 +516,7 @@ Container(
                                                   children: [
                                                     Expanded(
                                                       child: Text(widget
-                                                          .event.userId[index]),
+                                                          .event.userName![index]),
                                                     ),
                                                     const SizedBox(width: 8),
                                                     Expanded(
