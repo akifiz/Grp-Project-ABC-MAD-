@@ -172,6 +172,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     return result;
   }
 
+
   String printBalance(int userIndex, String splitString, List<String> userName) {
     if(userName.length == 1) return "";
     List<double> split = mapToDoubleList(splitString);
@@ -225,6 +226,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             List<double> split = mapToDoubleList(_expenses[_expenses.length - 1 - index].split);
             String date = _expenses[_expenses.length - 1 - index].date;
             String time = _expenses[_expenses.length - 1 - index].time;
+            List<String> userName = widget.event.userName ?? [''];
             return Align(
                 alignment: Alignment.center,
                 child: Container(
