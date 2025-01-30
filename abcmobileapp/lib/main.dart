@@ -7,7 +7,7 @@ import 'model.dart';
 import 'settings.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -39,10 +39,10 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
-  //TODO: fetch userId based on account login
   int _currentIndex = 1;
   final PageController _pageController = PageController(initialPage: 1);
   List<Event> _events = [];
+  User? _userData;
   
   @override
   void initState() {
@@ -59,28 +59,17 @@ class _MainAppState extends State<MainApp> {
   Future<void> _loadUserData() async {
     try {
       final handler = FirebaseHandler();
-      User _userData = await handler.fetchUserData(userId);
-
-      List<Event> userEvents = await handler.fetchEvents(_userData.eventId);
+      User userData = await handler.fetchUserData(userId);
+      List<Event> userEvents = await handler.fetchEvents(userData.eventId);
+      
       setState(() {
+        _userData = userData;
         _events = userEvents;
       });
-    }catch(e){
+    } catch(e) {
       print('Error loading user data $e');
     }
   }
-
-
-
-  // void _updateEvent(Event event) {
-  //   // final index = events.indexWhere((e) => e.id == event.id);
-  //   // if (index != -1) {
-  //   //   setState(() {
-  //   //     events[index] = event;
-  //   //   });
-  //   //   _saveEvents();
-  //   // }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -96,22 +85,21 @@ class _MainAppState extends State<MainApp> {
           BaseLayout(
             currentIndex: _currentIndex,
             onTabTapped: _onTabTapped,
-            child: SettingsPage(
-            ),
+            child: SettingsPage(),
           ),
           BaseLayout(
             currentIndex: _currentIndex,
             onTabTapped: _onTabTapped,
             child: DashboardPage(
-              events: _events
+              events: _events,
             ),
           ),
           BaseLayout(
             currentIndex: _currentIndex,
             onTabTapped: _onTabTapped,
             child: EventsPage(
+              userData: _userData ?? User(userId: '', defaultName: '', eventId: []),
               events: _events,
-              onEventUpdated: _loadUserData,
             ),
           ),
         ],
