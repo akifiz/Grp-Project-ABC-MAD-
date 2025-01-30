@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'sign_up_page.dart'; // Import SignUpPage for navigation
 import 'main.dart'; // Import MainApp for navigation
+import 'model.dart';
 
 class SignInPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
@@ -26,11 +27,13 @@ class SignInPage extends StatelessWidget {
         password: password,
       );
 
+      User? user = creds.user;
+      global_userId = user!.uid; // Get the UID
+
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isLoggedIn', true);
-      await prefs.setString('userId', creds.user!.uid);
-      User? user = creds.user;
-      await prefs.setString('email', user!.email!);
+      await prefs.setString('userId', user.uid);
+      await prefs.setString('email', user.email!);
 
       // Navigate to the main app after successful sign-in
       Navigator.of(context).pushReplacement(

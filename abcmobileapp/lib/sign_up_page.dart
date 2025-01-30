@@ -3,27 +3,37 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'main.dart'; // Import MainApp for navigation
+import 'model.dart';
 
 class SignUpPage extends StatelessWidget {
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   Future<void> _signUp(BuildContext context) async {
     try {
+      final defaultName = _nameController.text.trim();
       final email = _emailController.text.trim();
       final password = _passwordController.text.trim();
 
-      if (email.isEmpty || password.isEmpty) {
+      if (email.isEmpty || password.isEmpty || defaultName.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please fill in all fields')),
         );
         return;
       }
 
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
+
+      String uid = userCredential.user!.uid; // Get the UID
+      global_userId = uid;
+      
+      FirebaseHandler handler = FirebaseHandler();
+      await handler.createUserData(uid, defaultName);
 
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isLoggedIn', true);
@@ -50,6 +60,13 @@ class SignUpPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            TextField(
+              controller: _nameController,
+              decoration: const InputDecoration(
+                labelText: 'Your Name',
+              ),
+            ),
+            const SizedBox(height: 16),
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(
