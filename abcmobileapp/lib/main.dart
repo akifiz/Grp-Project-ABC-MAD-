@@ -110,7 +110,7 @@ class _MainAppState extends State<MainApp> {
             currentIndex: _currentIndex,
             onTabTapped: _onTabTapped,
             child: EventsPage(
-              userData: _userData ?? User(userId: '', defaultName: '', eventId: []),
+              onEventUpdated: _loadUserData,
               events: _events,
             ),
           ),
