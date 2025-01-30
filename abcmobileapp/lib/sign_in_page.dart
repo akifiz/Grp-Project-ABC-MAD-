@@ -28,11 +28,11 @@ class SignInPage extends StatelessWidget {
       );
 
       User? user = creds.user;
-      global_userId = user!.uid; // Get the UID
+      //global_userId = user!.uid; // Get the UID
 
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isLoggedIn', true);
-      await prefs.setString('userId', user.uid);
+      await prefs.setString('userId', user!.uid);
       await prefs.setString('email', user.email!);
 
       // Navigate to the main app after successful sign-in

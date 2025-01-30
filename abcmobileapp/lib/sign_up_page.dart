@@ -30,8 +30,8 @@ class SignUpPage extends StatelessWidget {
       );
 
       String uid = userCredential.user!.uid; // Get the UID
-      global_userId = uid;
-      
+      //global_userId = uid;
+
       FirebaseHandler handler = FirebaseHandler();
       await handler.createUserData(uid, defaultName);
 
