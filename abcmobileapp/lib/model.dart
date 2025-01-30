@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:core';
 
-String global_userId = "";
-String global_defaultName = "";
+String global_userId = "U1";
+String global_defaultName = "You";
 
 String generateUuid(){
   var uuid = Uuid();
@@ -318,3 +318,5 @@ List<double> addDoubleLists(List<double> list1, List<double> list2) {
   int minLength = list1.length < list2.length ? list1.length : list2.length;
   return List.generate(minLength, (i) => list1[i] + list2[i]);
 }
+
+
