@@ -1,8 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:uuid/uuid.dart';
 import 'dart:core';
 
 final String global_userId = "U1";
 String global_userName = "";
+
+String generateUuid(){
+  var uuid = Uuid();
+  return uuid.v4();
+}
 
 class User {
   final String userId;
@@ -32,6 +38,7 @@ class Event {
   final String time;
   double totalSpending;
   List<String> userId;
+  List<String>? userName;
   List<String> balance;
   List<Expense>? expenses; 
 
@@ -42,6 +49,7 @@ class Event {
     required this.time,
     required this.totalSpending,
     required this.userId,
+    this.userName,
     required this.balance,
     this.expenses, 
   });
@@ -54,6 +62,7 @@ class Event {
       time: data['time'],
       totalSpending: data['totalSpending'],
       userId: List<String>.from(data['userId']),
+      userName: List<String>.from(data['userName']),
       balance: List<String>.from(data['balance']),
       expenses: [], 
     );
@@ -120,6 +129,7 @@ Future<List<Event>> fetchEvents(List<String> eventList) async {
         time: eventData['time'],
         totalSpending: eventData['totalSpending'],
         userId: List<String>.from(eventData['userId']),
+        userName: List<String>.from(eventData['userName']),
         balance: List<String>.from(eventData['balance']),
         expenses: eventExpenses, // ✅ Load expenses into event
       ));
@@ -163,11 +173,19 @@ Future<List<Expense>> fetchExpenses(String eventId) async {
 
   Future<void> createEvent(Event event) async {
   try{
+    //fetch names of user in the event
+    List<String> userName = [];
+    for(var id in event.userId){
+      DocumentSnapshot userData = await _firestore.collection('USERS').doc(id).get();
+      userName.add(userData['defaultName']);
+    }
+
     await _firestore.collection('EVENTS').doc(event.eventId).set({
       'eventId': event.eventId,
       'title': event.title,
       'date': event.date,
-      'time': event.time, 
+      'time': event.time,
+      'userName': userName,
       'totalSpending': event.totalSpending,
       'userId': List<String>.from(event.userId),
     });
