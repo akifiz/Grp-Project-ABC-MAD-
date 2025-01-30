@@ -29,9 +29,18 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   final TextEditingController amountController = TextEditingController();
   final TextEditingController titleController = TextEditingController();
 
-  String _currencyString = 'RM';
+  String _currencyAppend = 'RM';
   String _currency = 'MYR';
   double _exchangeRate = 1;
+  final List<String> currencies = ['USD', 'EUR', 'GBP', 'MYR', 'JPY'];
+  final Map<String, String> currencyAppends = {
+    'USD': 'US\$',
+    'EUR': '€',
+    'GBP': '£',
+    'MYR': 'RM',
+    'JPY': '¥'
+  };
+
 
   @override
   void initState() {
@@ -48,6 +57,25 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       costControllers.add(TextEditingController());
     }
     _updateCostSplit();
+  }
+
+  void _showCurrencyOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Wrap(
+          children: currencies.map((currency) {
+            return ListTile(
+              title: Text(currency),
+              onTap: () {
+                Navigator.pop(context);
+                _loadExchangeRate(currency, currencyAppends[currency] ?? '');
+              },
+            );
+          }).toList(),
+        );
+      },
+    );
   }
 
   void _updateCostSplit() {
@@ -85,17 +113,13 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     }
   }
 
-  Future<void> _loadExchangeRate(String currency, String currencyString)async{
-    if(currency=='MYR'){
-      _exchangeRate = 1;
-      return;
-    }
+  Future<void> _loadExchangeRate(String currency, String currencyAppend)async{
     try{
       final String fromCurrency = 'MYR';
       _exchangeRate = await getExchangeRate(fromCurrency, currency);
       setState((){
-        _currency = 'USD';
-        _currencyString = 'US\$';
+        _currency = currency;
+        _currencyAppend = currencyAppend;
       });
     }catch(e){
       print("Failed to load exchange rate");
@@ -151,17 +175,13 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             IconButton(
               icon: const Icon(Icons.currency_exchange),
               tooltip: 'Change Currency',
-              onPressed: () {
-                setState(() {
-                  _loadExchangeRate("USD", 'US\$');
-                });
-              },
+              onPressed: () => _showCurrencyOptions(context),
             ),
           ]),
       body: Column(children: [
         Text(
-          "Total Spent: ${moneyFormat(_currencyString, widget.event.totalSpending, _exchangeRate)}\n"+
-          "Your spending: ${moneyFormat(_currencyString, mapToDoubleList(widget.event.balance[_userIndex])[_userIndex], _exchangeRate)}\n"+
+          "Total Spent: ${moneyFormat(_currencyAppend, widget.event.totalSpending, _exchangeRate)}\n"+
+          "Your spending: ${moneyFormat(_currencyAppend, mapToDoubleList(widget.event.balance[_userIndex])[_userIndex], _exchangeRate)}\n"+
           "Balance: ${widget.event.balance[_userIndex]}",
           style: TextStyle(
               color: Colors.black,
@@ -224,7 +244,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Amount: ${moneyFormat(_currencyString, amount, _exchangeRate)}",
+                            "Amount: ${moneyFormat(_currencyAppend, amount, _exchangeRate)}",
                             style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
@@ -499,3 +519,4 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     );
   }
 }
+
