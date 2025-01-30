@@ -1,10 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class CurrencyService {
-  final String apiKey = '1ee98bce2ddfa793c007ac3a';
 
   Future<double> getExchangeRate(String fromCurrency, String toCurrency) async {
+    final String apiKey = '1ee98bce2ddfa793c007ac3a';
     final url = Uri.parse('https://v6.exchangerate-api.com/v6/$apiKey/latest/$fromCurrency');
     
     try {
@@ -21,4 +20,3 @@ class CurrencyService {
       throw Exception('Error fetching exchange rate: $e');
     }
   }
-}
