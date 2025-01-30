@@ -6,8 +6,7 @@
 <small>AHMAD KHAIRIL AMIN BIN HISHAMUDDIN - 2212947</small>
 
 ## Overview
-
-## Objective
+Our mobile app aims to streamline group spending by providing a user-friendly platform for tracking expenses and settling debts among friends or colleagues. Utilizing Firebase authentication, users can securely log in and manage their transactions. The app features real-time data updates, ensuring all group members have current information on shared expenses. A key highlight is its automatic currency conversion capability, catering to diverse international user bases. Whether splitting bills during travel or organizing shared costs in local currencies, our app simplifies financial management with accuracy and efficiency.
 
 ## How To Run
 1. clone the repo <br>
@@ -17,4 +16,7 @@
 > ..> flutter pub get  
 > ..> flutter run
 
-## Database Structure (for now)
+## Screenshots
+
+## HTTP library implementation
+
