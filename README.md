@@ -17,11 +17,22 @@ Our mobile app aims to streamline group spending by providing a user-friendly pl
 > ..> flutter run
 
 ## Screenshots
+### Phone Screen Portrait
 ![Screenshot 2025-01-30 235427](https://github.com/user-attachments/assets/e8d60560-dcc6-47b4-8f62-1a354e0cf2a6)
 ![Screenshot 2025-01-30 235509](https://github.com/user-attachments/assets/02b12bcb-84b3-4585-b378-9c13cfe36888)
 ![Screenshot 2025-01-30 235526](https://github.com/user-attachments/assets/5bb41362-3767-4a5f-866c-d36afc3d8c34)
 ![Screenshot 2025-01-30 235552](https://github.com/user-attachments/assets/9b6a8baa-ca0c-4c36-9e1e-cb03e2331b1d)
 ![Screenshot 2025-01-30 235604](https://github.com/user-attachments/assets/28052b7a-995c-47e1-a31b-673312b68f5c)
+![Screenshot 2025-01-31 001917](https://github.com/user-attachments/assets/18ad11da-7872-41eb-9ffe-22fc3d3dff5a)
+
+### Ipad Mini Screen Portrait
+![Screenshot 2025-01-30 235923](https://github.com/user-attachments/assets/f2fd11e6-ac85-49e9-8861-6286a860fdcb)
+![Screenshot 2025-01-31 000014](https://github.com/user-attachments/assets/32a868b6-63c1-43d4-b1b5-7546eee31a59)
+![Screenshot 2025-01-30 235725](https://github.com/user-attachments/assets/35e94133-7af7-49c6-83f4-5f1bb37a04bf)
+
+
+
+
 
 
 
